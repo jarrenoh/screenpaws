@@ -1,24 +1,66 @@
-import { StyleSheet, Text, Touchable, TouchableOpacity, View } from 'react-native'
-import React from 'react'
-import { auth } from '../firebase'
-import { useNavigation } from '@react-navigation/core'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { auth } from '../firebase';
+import { useNavigation } from '@react-navigation/core';
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
 
-  const navigation = useNavigation()
+  useEffect(() => {
+    let interval;
+    if (timerActive) {
+      interval = setInterval(() => {
+        setElapsedTime(prevTime => prevTime + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [timerActive]);
 
   const handleLogout = () => {
     auth.signOut()
-    .then(() => {
-      console.log('Logged out')
-      navigation.replace('Login')
-    })
-    .catch(error => alert(error.message))
-  }  
+      .then(() => {
+        console.log('Logged out');
+        navigation.replace('Login');
+      })
+      .catch(error => alert(error.message));
+  };
+
+  const handleToggleTimer = () => {
+    setTimerActive(prevState => !prevState);
+  };
+
+  const handleResetTimer = () => {
+    setElapsedTime(0);
+    setTimerActive(false);
+  };
+
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
 
   return (
-    <View style-={styles.container}>
+    <View style={styles.container}>
       <Text>Email: {auth.currentUser?.email}</Text>
+      <Text style={styles.timer}>{formatTime(elapsedTime)}</Text>
+      <TouchableOpacity
+        onPress={handleToggleTimer}
+        style={[styles.button, timerActive ? styles.stopButton : styles.startButton]}
+      >
+        <Text style={styles.buttonText}>{timerActive ? 'Stop' : 'Start'}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={handleResetTimer}
+        style={[styles.button, styles.resetButton]}
+      >
+        <Text style={styles.buttonText}>Reset</Text>
+      </TouchableOpacity>
       <TouchableOpacity
         onPress={handleLogout}
         style={styles.button}
@@ -26,28 +68,41 @@ const HomeScreen = () => {
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default HomeScreen
+export default HomeScreen;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    button: {
-        backgroundColor: 'blue',
-        padding: 15,
-        width: '60%',
-        borderRadius: 10,
-        alignItems : 'center',
-        marginTop: 40,
-    },
-    
-    buttonText: {
-        color: 'white',
-        fontWeight: 'bold'
-    }
-})
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  button: {
+    backgroundColor: 'blue',
+    padding: 15,
+    width: '60%',
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  startButton: {
+    backgroundColor: 'green',
+  },
+  stopButton: {
+    backgroundColor: 'red',
+  },
+  resetButton: {
+    backgroundColor: 'gray',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold'
+  },
+  timer: {
+    fontSize: 32,
+    marginTop: 20,
+    fontWeight: 'bold',
+  }
+});
