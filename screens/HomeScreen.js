@@ -1,7 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'; // Import Image component
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
+import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -47,6 +48,7 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Image source={pawLogo} style={styles.image} />
       <Text>Email: {auth.currentUser?.email}</Text>
       <Text style={styles.timer}>{formatTime(elapsedTime)}</Text>
       <TouchableOpacity
@@ -104,5 +106,10 @@ const styles = StyleSheet.create({
     fontSize: 32,
     marginTop: 20,
     fontWeight: 'bold',
+  },
+  image: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
   }
 });

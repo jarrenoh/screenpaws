@@ -1,7 +1,8 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity, Image} from 'react-native'
 import React, { useEffect, useState }  from 'react'
 import { auth } from '../firebase'
 import { useNavigation } from '@react-navigation/core'
+import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('')
@@ -43,7 +44,8 @@ const LoginScreen = () => {
     <KeyboardAvoidingView
         behavior='padding'
         style={styles.container}
-    >
+    >   
+        <Image source={pawLogo} style={styles.image}/>
         <View style={styles.inputContainer}>
             <TextInput
                 placeholder='Email'
@@ -123,6 +125,10 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontWeight: 'bold'
+    },
+    image: {
+      width: 100,
+      height: 100,
+      marginBottom: 20,
     }
-    
 })
