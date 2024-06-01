@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View, Image, TextInput } from 'reac
 import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
+import CustomNavbar from '../components/CustomNavbar';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -103,7 +104,7 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={pawLogo} style={styles.image} />
+      <Image source={pawLogo} style={[styles.image, styles.imageMargin]} />
       <Text>Email: {auth.currentUser?.email}</Text>
       <TextInput
         style={styles.input}
@@ -134,13 +135,8 @@ const HomeScreen = () => {
       >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Pet')} // Navigate to the PetScreen
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Go to Pet Screen</Text>
-      </TouchableOpacity>
       <Text style={styles.timer}>Elapsed Time: {formatTime(elapsedTime)}</Text>
+      <CustomNavbar />
     </View>
   );
 };
@@ -151,7 +147,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   button: {
     backgroundColor: 'blue',
@@ -175,17 +171,20 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   timer: {
     fontSize: 32,
-    marginTop: 20,
+    marginBottom: 10, 
     fontWeight: 'bold',
   },
   image: {
     width: 100,
     height: 100,
-    marginBottom: 20,
+    marginBottom: 10, 
+  },
+  imageMargin: {
+    marginBottom: 20, 
   },
   input: {
     height: 40,
@@ -196,6 +195,6 @@ const styles = StyleSheet.create({
     width: '60%',
     borderRadius: 10,
     textAlign: 'center',
-  }
+  },
 });
 
