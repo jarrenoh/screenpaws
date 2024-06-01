@@ -57,7 +57,8 @@ const HomeScreen = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await updateElapsedTimeInFirestore(elapsedTime); // Save elapsed time before logout
     auth.signOut()
       .then(() => {
         console.log('Logged out');
@@ -78,8 +79,9 @@ const HomeScreen = () => {
   };
 
   const handleResetTimer = () => {
-    setTimerActive(false);
     setCountdownTime(0);
+    setTimerActive(false);
+    updateElapsedTimeInFirestore(elapsedTime); // Save elapsed time when resetting
   };
 
   const handleSetTime = () => {
@@ -90,7 +92,6 @@ const HomeScreen = () => {
     }
     setCountdownTime(timeInSeconds);
     setTimeInput('');
-    setElapsedTime(0);  // Reset elapsed time when a new countdown time is set
   };
 
   useEffect(() => {
