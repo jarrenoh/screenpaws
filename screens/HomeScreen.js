@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Image, TextInput } from 'react-native';
 import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
@@ -12,6 +11,7 @@ const HomeScreen = () => {
   const [timerActive, setTimerActive] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const fetchElapsedTime = async () => {
@@ -29,19 +29,20 @@ const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    let interval;
     if (timerActive && countdownTime > 0) {
-      interval = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         const currentTime = Date.now();
-        const newElapsedTime = Math.floor((currentTime - startTime) / 1000);
+        const newElapsedTime = elapsedTime + Math.floor((currentTime - startTime) / 1000);
         setElapsedTime(newElapsedTime);
+        setStartTime(currentTime); // Reset the start time for the next interval
         setCountdownTime(prevTime => prevTime - 1);
+        updateElapsedTimeInFirestore(newElapsedTime); // Update elapsed time in Firestore
       }, 1000);
     } else {
-      clearInterval(interval);
+      clearInterval(intervalRef.current);
     }
 
-    return () => clearInterval(interval);
+    return () => clearInterval(intervalRef.current);
   }, [timerActive, countdownTime]);
 
   const updateElapsedTimeInFirestore = async (newElapsedTime) => {
@@ -74,7 +75,7 @@ const HomeScreen = () => {
       return;
     }
     if (!timerActive) {
-      setStartTime(Date.now() - elapsedTime * 1000);
+      setStartTime(Date.now());
     }
     setTimerActive(prevState => !prevState);
   };
@@ -82,7 +83,6 @@ const HomeScreen = () => {
   const handleResetTimer = () => {
     setCountdownTime(0);
     setTimerActive(false);
-    updateElapsedTimeInFirestore(elapsedTime); // Save elapsed time when resetting
   };
 
   const handleSetTime = () => {
@@ -94,12 +94,6 @@ const HomeScreen = () => {
     setCountdownTime(timeInSeconds);
     setTimeInput('');
   };
-
-  useEffect(() => {
-    if (!timerActive) {
-      updateElapsedTimeInFirestore(elapsedTime);
-    }
-  }, [timerActive, elapsedTime]);
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
