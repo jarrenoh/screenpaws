@@ -7,15 +7,18 @@ import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-b
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [timeInput, setTimeInput] = useState('');
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [timerActive, setTimerActive] = useState(false);
   const [countdownTime, setCountdownTime] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+  const [startTime, setStartTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
     let interval;
     if (timerActive && countdownTime > 0) {
       interval = setInterval(() => {
-        setElapsedTime(prevTime => prevTime + 1);
+        const currentTime = Date.now();
+        const newElapsedTime = Math.floor((currentTime - startTime) / 1000);
+        setElapsedTime(newElapsedTime);
         setCountdownTime(prevTime => prevTime - 1);
       }, 1000);
     } else {
@@ -39,11 +42,13 @@ const HomeScreen = () => {
       alert('Please set a valid countdown time');
       return;
     }
+    if (!timerActive) {
+      setStartTime(Date.now() - elapsedTime * 1000);
+    }
     setTimerActive(prevState => !prevState);
   };
 
   const handleResetTimer = () => {
-    setElapsedTime(0);
     setTimerActive(false);
     setCountdownTime(0);
   };
@@ -56,6 +61,7 @@ const HomeScreen = () => {
     }
     setCountdownTime(timeInSeconds);
     setTimeInput('');
+    setElapsedTime(0);  // Reset elapsed time when a new countdown time is set
   };
 
   const formatTime = (timeInSeconds) => {
@@ -97,6 +103,7 @@ const HomeScreen = () => {
       >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
+      <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
     </View>
   );
 };
@@ -154,3 +161,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   }
 });
+1
