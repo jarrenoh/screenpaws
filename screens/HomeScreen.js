@@ -139,6 +139,12 @@ const HomeScreen = () => {
       >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Pet')} // Navigate to the PetScreen
+        style={styles.button}
+      >
+        <Text style={styles.buttonText}>Go to Pet Screen</Text>
+      </TouchableOpacity>
       <Text style={styles.timer}>Elapsed Time: {formatTime(elapsedTime)}</Text>
     </View>
   );
