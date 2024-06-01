@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Image, TextInput } from 'react-native';
-import { auth } from '../firebase';
+import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
 
@@ -11,6 +11,21 @@ const HomeScreen = () => {
   const [timerActive, setTimerActive] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+
+  useEffect(() => {
+    const fetchElapsedTime = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          setElapsedTime(userData.elapsedTime || 0);
+        }
+      }
+    };
+
+    fetchElapsedTime();
+  }, []);
 
   useEffect(() => {
     let interval;
@@ -27,6 +42,20 @@ const HomeScreen = () => {
 
     return () => clearInterval(interval);
   }, [timerActive, countdownTime]);
+
+  const updateElapsedTimeInFirestore = async (newElapsedTime) => {
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        await firestore.collection('users').doc(user.uid).set(
+          { elapsedTime: newElapsedTime },
+          { merge: true }
+        );
+      } catch (error) {
+        console.error("Error updating Firestore:", error);
+      }
+    }
+  };
 
   const handleLogout = () => {
     auth.signOut()
@@ -63,6 +92,12 @@ const HomeScreen = () => {
     setTimeInput('');
     setElapsedTime(0);  // Reset elapsed time when a new countdown time is set
   };
+
+  useEffect(() => {
+    if (!timerActive) {
+      updateElapsedTimeInFirestore(elapsedTime);
+    }
+  }, [timerActive, elapsedTime]);
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
@@ -103,7 +138,7 @@ const HomeScreen = () => {
       >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
-      <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
+      <Text style={styles.timer}>Elapsed Time: {formatTime(elapsedTime)}</Text>
     </View>
   );
 };
@@ -161,4 +196,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   }
 });
-1
