@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'; // Import Image component
+import { StyleSheet, Text, TouchableOpacity, View, Image, TextInput } from 'react-native';
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const [timeInput, setTimeInput] = useState('');
   const [elapsedTime, setElapsedTime] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
+  const [countdownTime, setCountdownTime] = useState(0);
 
   useEffect(() => {
     let interval;
-    if (timerActive) {
+    if (timerActive && countdownTime > 0) {
       interval = setInterval(() => {
         setElapsedTime(prevTime => prevTime + 1);
+        setCountdownTime(prevTime => prevTime - 1);
       }, 1000);
     } else {
       clearInterval(interval);
     }
 
     return () => clearInterval(interval);
-  }, [timerActive]);
+  }, [timerActive, countdownTime]);
 
   const handleLogout = () => {
     auth.signOut()
@@ -32,12 +35,27 @@ const HomeScreen = () => {
   };
 
   const handleToggleTimer = () => {
+    if (!timerActive && countdownTime <= 0) {
+      alert('Please set a valid countdown time');
+      return;
+    }
     setTimerActive(prevState => !prevState);
   };
 
   const handleResetTimer = () => {
     setElapsedTime(0);
     setTimerActive(false);
+    setCountdownTime(0);
+  };
+
+  const handleSetTime = () => {
+    const timeInSeconds = parseInt(timeInput) * 60;
+    if (isNaN(timeInSeconds) || timeInSeconds <= 0 || timeInSeconds > 7200) {
+      alert('Please enter a valid time in minutes (1-120)');
+      return;
+    }
+    setCountdownTime(timeInSeconds);
+    setTimeInput('');
   };
 
   const formatTime = (timeInSeconds) => {
@@ -50,7 +68,17 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <Image source={pawLogo} style={styles.image} />
       <Text>Email: {auth.currentUser?.email}</Text>
-      <Text style={styles.timer}>{formatTime(elapsedTime)}</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter time in minutes"
+        keyboardType="numeric"
+        value={timeInput}
+        onChangeText={setTimeInput}
+      />
+      <TouchableOpacity onPress={handleSetTime} style={[styles.button, styles.setButton]}>
+        <Text style={styles.buttonText}>Set Time</Text>
+      </TouchableOpacity>
+      <Text style={styles.timer}>{formatTime(countdownTime)}</Text>
       <TouchableOpacity
         onPress={handleToggleTimer}
         style={[styles.button, timerActive ? styles.stopButton : styles.startButton]}
@@ -98,6 +126,9 @@ const styles = StyleSheet.create({
   resetButton: {
     backgroundColor: 'gray',
   },
+  setButton: {
+    backgroundColor: 'orange',
+  },
   buttonText: {
     color: 'white',
     fontWeight: 'bold'
@@ -111,5 +142,15 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    marginTop: 20,
+    width: '60%',
+    borderRadius: 10,
+    textAlign: 'center',
   }
 });
