@@ -102,10 +102,14 @@ const HomeScreen = () => {
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
+  const getNameFromEmail = (email) => {
+    return email ? email.split('@')[0] : '';
+  };
+
   return (
     <View style={styles.container}>
       <Image source={pawLogo} style={[styles.image, styles.imageMargin]} />
-      <Text>Email: {auth.currentUser?.email}</Text>
+      <Text>Welcome {getNameFromEmail(auth.currentUser?.email)}!</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter time in minutes"
@@ -197,4 +201,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
