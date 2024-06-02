@@ -1,14 +1,15 @@
 import React from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import CustomNavbar from '../components/CustomNavbar';
+import placeholderImage from '../assets/dog.png'; // Make sure to replace this with the path to your image
 
 const PetScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <TextInput
-          style={styles.input}
-          placeholder="Placeholder for now"
+        <Image
+          source={placeholderImage}
+          style={styles.image}
         />
       </View>
       <View style={styles.navbarContainer}>
@@ -31,14 +32,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    width: '80%',
-    borderRadius: 10,
-    textAlign: 'center'
+  image: {
+    width: 200, // Adjust the width as needed
+    height: 200, // Adjust the height as needed
+    resizeMode: 'contain', // Adjust the resize mode as needed
   },
   navbarContainer: {
     position: 'absolute',
