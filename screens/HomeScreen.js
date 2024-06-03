@@ -107,6 +107,7 @@ const HomeScreen = () => {
   };
 
   return (
+    <View style={{ flex: 1 }}>
     <View style={styles.container}>
       <Image source={pawLogo} style={[styles.image, styles.imageMargin]} />
       <Text>Welcome {getNameFromEmail(auth.currentUser?.email)}!</Text>
@@ -140,6 +141,7 @@ const HomeScreen = () => {
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
       <Text style={styles.timer}>Elapsed Time: {formatTime(elapsedTime)}</Text>
+      </View>
       <CustomNavbar />
     </View>
   );

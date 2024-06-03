@@ -10,7 +10,18 @@ const PetScreen = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchUserData = async () => {// In your calculateXpPercentage function
+const calculateXpPercentage = () => {
+  const currentLevelXp = (level - 1) * 10;
+  const nextLevelXp = level * 10;
+  const levelXpRange = nextLevelXp - currentLevelXp;
+  const xpIntoLevel = xp - currentLevelXp;
+  const xpPercentage = (xpIntoLevel / levelXpRange) * 100;
+  return isNaN(xpPercentage) || xpPercentage < 0 ? 0 : xpPercentage;
+};
+
+// In your render method
+<View style={[styles.xpBar, { width: `${calculateXpPercentage()}%` }]} />
       const user = auth.currentUser;
       if (user) {
         const userDoc = await firestore.collection('users').doc(user.uid).get();
@@ -28,7 +39,17 @@ const PetScreen = () => {
     fetchUserData();
   }, []);
 
+  const calculateXpPercentage = () => {
+    const currentLevelXp = (level - 1) * 10;
+    const nextLevelXp = level * 10;
+    const levelXpRange = nextLevelXp - currentLevelXp;
+    const xpIntoLevel = xp - currentLevelXp;
+    const xpPercentage = (xpIntoLevel / levelXpRange) * 100;
+    return isNaN(xpPercentage) ? 0 : xpPercentage;
+  };
+
   return (
+    
     <View style={styles.container}>
       <View style={styles.content}>
         <Image
@@ -37,6 +58,9 @@ const PetScreen = () => {
         />
         <Text style={styles.text}>XP: {xp}</Text>
         <Text style={styles.text}>Level: {level}</Text>
+        <View style={styles.xpBarContainer}>
+        <View style={[styles.xpBar, { width: '50%' }]} /><View style={[styles.xpBar, { width: '50%' }]} />
+        </View>
       </View>
       <View style={styles.navbarContainer}>
         <CustomNavbar />
@@ -67,6 +91,18 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginTop: 10,
     fontWeight: 'bold'
+  },
+  xpBarContainer: {
+    width: '80%',
+    height: 20,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 10,
+    marginTop: 20,
+    overflow: 'hidden'
+  },
+  xpBar: {
+    height: '100%',
+    backgroundColor: '#76c7c0'
   },
   navbarContainer: {
     position: 'absolute',
