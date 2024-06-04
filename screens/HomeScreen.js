@@ -49,9 +49,11 @@ const HomeScreen = () => {
   const updateElapsedTimeInFirestore = async (newElapsedTime) => {
     const user = auth.currentUser;
     if (user) {
+      const newXp = Math.floor(newElapsedTime / 60); // 1 XP per minute
+      const newLevel = Math.floor(newXp / 10) + 1; // 10 XP per level
       try {
         await firestore.collection('users').doc(user.uid).set(
-          { elapsedTime: newElapsedTime },
+          { elapsedTime: newElapsedTime, xp: newXp, level: newLevel },
           { merge: true }
         );
       } catch (error) {

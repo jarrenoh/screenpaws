@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Text } from 'react-native';
-import { auth, firestore } from '../firebase'; // Import Firebase configuration
+import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
-import placeholderImage from '../assets/dog.png'; // Make sure to replace this with the path to your image
+import placeholderImage from '../assets/dog.png';
 
 const PetScreen = () => {
   const [xp, setXp] = useState(0);
@@ -10,18 +10,7 @@ const PetScreen = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
-    const fetchUserData = async () => {// In your calculateXpPercentage function
-const calculateXpPercentage = () => {
-  const currentLevelXp = (level - 1) * 10;
-  const nextLevelXp = level * 10;
-  const levelXpRange = nextLevelXp - currentLevelXp;
-  const xpIntoLevel = xp - currentLevelXp;
-  const xpPercentage = (xpIntoLevel / levelXpRange) * 100;
-  return isNaN(xpPercentage) || xpPercentage < 0 ? 0 : xpPercentage;
-};
-
-// In your render method
-<View style={[styles.xpBar, { width: `${calculateXpPercentage()}%` }]} />
+    const fetchUserData = async () => {
       const user = auth.currentUser;
       if (user) {
         const userDoc = await firestore.collection('users').doc(user.uid).get();
@@ -29,9 +18,10 @@ const calculateXpPercentage = () => {
           const userData = userDoc.data();
           const userElapsedTime = userData.elapsedTime || 0;
           setElapsedTime(userElapsedTime);
-          const userXp = Math.floor(userElapsedTime / 60); // 1 XP per minute
+          const userXp = userData.xp || Math.floor(userElapsedTime / 60); // 1 XP per minute
           setXp(userXp);
-          setLevel(Math.floor(userXp / 10) + 1); // 10 XP per level
+          const userLevel = userData.level || Math.floor(userXp / 10) + 1; // 10 XP per level
+          setLevel(userLevel);
         }
       }
     };
@@ -49,17 +39,13 @@ const calculateXpPercentage = () => {
   };
 
   return (
-    
     <View style={styles.container}>
       <View style={styles.content}>
-        <Image
-          source={placeholderImage}
-          style={styles.image}
-        />
+        <Image source={placeholderImage} style={styles.image} />
         <Text style={styles.text}>XP: {xp}</Text>
         <Text style={styles.text}>Level: {level}</Text>
         <View style={styles.xpBarContainer}>
-        <View style={[styles.xpBar, { width: '50%' }]} /><View style={[styles.xpBar, { width: '50%' }]} />
+          <View style={[styles.xpBar, { width: `${calculateXpPercentage()}%` }]} />
         </View>
       </View>
       <View style={styles.navbarContainer}>
@@ -83,9 +69,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   image: {
-    width: 200, // Adjust the width as needed
-    height: 200, // Adjust the height as needed
-    resizeMode: 'contain', // Adjust the resize mode as needed
+    width: 200,
+    height: 200,
+    resizeMode: 'contain'
   },
   text: {
     fontSize: 24,
@@ -110,3 +96,4 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 });
+
