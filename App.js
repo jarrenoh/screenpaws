@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import PetScreen from './screens/PetScreen';
+import RegisterScreen from './screens/RegisterScreen';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Stack.Screen options= {{headerShown: false}} name="Login" component={LoginScreen} />
         <Stack.Screen options= {{headerShown: false}} name="Home" component={HomeScreen} />
         <Stack.Screen options= {{headerShown: false}} name="Pet" component={PetScreen} />
+        <Stack.Screen options= {{headerShown: false}} name="Register" component={RegisterScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

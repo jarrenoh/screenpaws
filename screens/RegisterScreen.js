@@ -1,10 +1,11 @@
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { auth } from '../firebase';
+import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -21,17 +22,50 @@ const LoginScreen = () => {
   }, []);
 
   const handleSignUp = () => {
-    navigation.navigate('Register');
+    firestore
+      .collection('users')
+      .where('username', '==', username)
+      .get()
+      .then((querySnapshot) => {
+        if (!querySnapshot.empty) {
+          alert('Username already exists. Please choose a different username.');
+        } else {
+          auth
+            .createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+              const user = userCredential.user;
+              user.updateProfile({
+                displayName: username
+              }).then(() => {
+                console.log('Username updated successfully');
+                firestore
+                  .collection('users')
+                  .doc(user.uid)
+                  .set({
+                    username: username,
+                    email: email
+                  })
+                  .then(() => {
+                    console.log('User added to Firestore');
+                  })
+                  .catch(error => {
+                    console.error('Error adding user to Firestore: ', error);
+                  });
+              }).catch(error => {
+                console.log('Error occurred while updating username', error);
+              });
+              console.log('Registered with:', user.email);
+            })
+            .catch(error => alert(error.message));
+        }
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
+      });
   };
 
   const handleLogin = () => {
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .then(userCredential => {
-        const user = userCredential.user;
-        console.log('Logged in with:', user.email);
-      })
-      .catch(error => alert(error.message));
+    navigation.navigate('Login');
   };
 
   return (
@@ -42,6 +76,12 @@ const LoginScreen = () => {
       <Image source={pawLogo} style={styles.image} />
       <Text style={styles.title}>ScreenPaws</Text>
       <View style={styles.inputContainer}>
+        <TextInput
+          placeholder='Username'
+          value={username}
+          onChangeText={text => setUsername(text)}
+          style={styles.input}
+        />
         <TextInput
           placeholder='Email'
           value={email}
@@ -75,7 +115,7 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
