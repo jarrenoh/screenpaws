@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image, TextInput } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Image, TextInput, AppState } from 'react-native';
 import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
@@ -45,6 +45,23 @@ const HomeScreen = () => {
 
     return () => clearInterval(intervalRef.current);
   }, [timerActive, countdownTime]);
+
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState) => {
+      if (nextAppState === 'background' || nextAppState === 'inactive') {
+        if (timerActive) {
+          setTimerActive(false);
+          clearInterval(intervalRef.current);
+        }
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [timerActive]);
 
   const updateElapsedTimeInFirestore = async (newElapsedTime) => {
     const user = auth.currentUser;
@@ -110,39 +127,39 @@ const HomeScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
-    <View style={styles.container}>
-      <Image source={pawLogo} style={[styles.image, styles.imageMargin]} />
-      <Text>Welcome {getNameFromEmail(auth.currentUser?.email)}!</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter time in minutes"
-        keyboardType="numeric"
-        value={timeInput}
-        onChangeText={setTimeInput}
-      />
-      <TouchableOpacity onPress={handleSetTime} style={[styles.button, styles.setButton]}>
-        <Text style={styles.buttonText}>Set Time</Text>
-      </TouchableOpacity>
-      <Text style={styles.timer}>{formatTime(countdownTime)}</Text>
-      <TouchableOpacity
-        onPress={handleToggleTimer}
-        style={[styles.button, timerActive ? styles.stopButton : styles.startButton]}
-      >
-        <Text style={styles.buttonText}>{timerActive ? 'Stop' : 'Start'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={handleResetTimer}
-        style={[styles.button, styles.resetButton]}
-      >
-        <Text style={styles.buttonText}>Reset</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={handleLogout}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
-      <Text style={styles.timer}>Elapsed Time: {formatTime(elapsedTime)}</Text>
+      <View style={styles.container}>
+        <Image source={pawLogo} style={[styles.image, styles.imageMargin]} />
+        <Text>Welcome {getNameFromEmail(auth.currentUser?.email)}!</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter time in minutes"
+          keyboardType="numeric"
+          value={timeInput}
+          onChangeText={setTimeInput}
+        />
+        <TouchableOpacity onPress={handleSetTime} style={[styles.button, styles.setButton]}>
+          <Text style={styles.buttonText}>Set Time</Text>
+        </TouchableOpacity>
+        <Text style={styles.timer}>{formatTime(countdownTime)}</Text>
+        <TouchableOpacity
+          onPress={handleToggleTimer}
+          style={[styles.button, timerActive ? styles.stopButton : styles.startButton]}
+        >
+          <Text style={styles.buttonText}>{timerActive ? 'Stop' : 'Start'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleResetTimer}
+          style={[styles.button, styles.resetButton]}
+        >
+          <Text style={styles.buttonText}>Reset</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleLogout}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Logout</Text>
+        </TouchableOpacity>
+        <Text style={styles.timer}>Elapsed Time: {formatTime(elapsedTime)}</Text>
       </View>
       <CustomNavbar />
     </View>
@@ -183,16 +200,16 @@ const styles = StyleSheet.create({
   },
   timer: {
     fontSize: 32,
-    marginBottom: 10, 
+    marginBottom: 10,
     fontWeight: 'bold',
   },
   image: {
     width: 100,
     height: 100,
-    marginBottom: 10, 
+    marginBottom: 10,
   },
   imageMargin: {
-    marginBottom: 20, 
+    marginBottom: 20,
   },
   input: {
     height: 40,
