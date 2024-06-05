@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Text } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
-import placeholderImage from '../assets/dog.png';
+import placeholderImage from '../assets/dog.jpeg';
+import swoledoge from '../assets/swole.webp';
 
 const PetScreen = () => {
   const [xp, setXp] = useState(0);
@@ -41,7 +42,7 @@ const PetScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Image source={placeholderImage} style={styles.image} />
+      <Image source={level >= 5 ? swoledoge : placeholderImage} style={styles.image} />
         <Text style={styles.text}>XP: {xp}</Text>
         <Text style={styles.text}>Level: {level}</Text>
         <View style={styles.xpBarContainer}>
