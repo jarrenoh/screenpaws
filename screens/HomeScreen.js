@@ -129,7 +129,7 @@ const HomeScreen = () => {
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <Image source={pawLogo} style={[styles.image, styles.imageMargin]} />
-        <Text>Welcome {getNameFromEmail(auth.currentUser?.email)}!</Text>
+        <Text>Welcome {auth.currentUser?.displayName}!</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter time in minutes"
