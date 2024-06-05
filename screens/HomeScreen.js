@@ -159,7 +159,7 @@ const HomeScreen = () => {
         >
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
-        <Text style={styles.timer}>Elapsed Time: {formatTime(elapsedTime)}</Text>
+        <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
       </View>
       <CustomNavbar />
     </View>

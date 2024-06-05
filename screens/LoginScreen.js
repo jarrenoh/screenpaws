@@ -56,7 +56,6 @@ const LoginScreen = () => {
           secureTextEntry
         />
       </View>
-
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={handleLogin}
@@ -64,12 +63,15 @@ const LoginScreen = () => {
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleSignUp}
-          style={[styles.button, styles.buttonOutline]}
-        >
-          <Text style={styles.buttonOutlineText}>Register</Text>
-        </TouchableOpacity>
+        <Text style={styles.registerText}>
+          New to ScreenPaws?{" "}
+          <Text 
+            onPress={handleSignUp}
+            style={styles.registerLink}
+          >
+             Sign Up
+          </Text>
+        </Text>
       </View>
     </KeyboardAvoidingView>
   );
@@ -129,5 +131,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-  }
+  },
+  registerText: {
+    marginTop: 15,
+    color: 'black',
+    fontSize: 16,
+  },
+  registerLink: {
+    fontWeight: 'bold',
+  },
 });
