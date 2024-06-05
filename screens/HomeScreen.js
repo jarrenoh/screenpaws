@@ -200,6 +200,7 @@ const styles = StyleSheet.create({
   },
   timer: {
     fontSize: 32,
+    marginTop: 20,
     marginBottom: 10,
     fontWeight: 'bold',
   },
