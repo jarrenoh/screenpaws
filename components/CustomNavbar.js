@@ -15,6 +15,9 @@ const CustomNavbar = () => {
       <TouchableOpacity onPress={() => navigation.navigate('Pet')} style={styles.navItem}>
         <Text style={styles.navText}>Pet</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Friends')} style={styles.navItem}>
+        <Text style={styles.navText}>Friends</Text>
+      </TouchableOpacity>
     </View>
   );
 };

@@ -130,6 +130,7 @@ const HomeScreen = () => {
       <View style={styles.container}>
         <Image source={pawLogo} style={[styles.image, styles.imageMargin]} />
         <Text>Welcome {auth.currentUser?.displayName}!</Text>
+        <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter time in minutes"
@@ -159,7 +160,7 @@ const HomeScreen = () => {
         >
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
-        <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
+        
       </View>
       <CustomNavbar />
     </View>
