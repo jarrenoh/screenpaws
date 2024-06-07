@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, TextInput, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
-import { firestore, auth } from '../firebase';
+import { firebase, firestore, auth } from '../firebase';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest } from '../components/friendFunctions';
 import CustomNavbar from '../components/CustomNavbar';
 
@@ -34,7 +34,7 @@ const FriendsScreen = () => {
     fetchFriendsAndRequests();
   }, [currentUserId]);
 
-  const handleAcceptRequest = async (requestId, fromUserId) => {
+  const handleAcceptRequest = async (fromUserId) => {
     await acceptFriendRequest(currentUserId, fromUserId);
     // Refresh the lists after accepting a request
     const userRef = firestore.collection('users').doc(currentUserId);
@@ -71,7 +71,7 @@ const FriendsScreen = () => {
       const success = await sendFriendRequest(currentUserId, targetUserId);
       if (success) {
         // Add the newly sent request to the local state
-        setFriendRequests(prevRequests => [...prevRequests, targetUserId]);
+        setFriendRequests(prevRequests => [...prevRequests, { userId: targetUserId, username: '' }]); // Update with actual username if available
         alert('Friend request sent successfully!');
       } else {
         alert('Failed to send friend request. Please try again later.');
@@ -82,6 +82,32 @@ const FriendsScreen = () => {
     }
   };
 
+  const renderFriendRequestItem = ({ item }) => (
+    <View style={styles.requestItem}>
+      <Text>{item.username}</Text>
+      <Button
+        title="Accept"
+        onPress={() => handleAcceptRequest(item.userId)}
+      />
+    </View>
+  );
+
+  const renderFriendItem = ({ item }) => (
+    <View style={styles.friendItem}>
+      <Text>{item.username}</Text>
+    </View>
+  );
+
+  const renderSearchResultItem = ({ item }) => (
+    <View style={styles.requestItem}>
+      <Text>{item.username}</Text>
+      <Button
+        title="Send Request"
+        onPress={() => handleSendRequest(item.id)}
+      />
+    </View>
+  );
+
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -91,16 +117,8 @@ const FriendsScreen = () => {
         ) : (
           <FlatList
             data={friendRequests}
-            keyExtractor={(item, index) => item + index}
-            renderItem={({ item }) => (
-              <View style={styles.requestItem}>
-                <Text>{item}</Text>
-                <Button
-                  title="Accept"
-                  onPress={() => handleAcceptRequest(item, item)}
-                />
-              </View>
-            )}
+            keyExtractor={(item) => item.userId}
+            renderItem={renderFriendRequestItem}
             ListEmptyComponent={<Text>No friend requests</Text>}
           />
         )}
@@ -111,12 +129,8 @@ const FriendsScreen = () => {
         ) : (
           <FlatList
             data={friends}
-            keyExtractor={(item, index) => item + index}
-            renderItem={({ item }) => (
-              <View style={styles.friendItem}>
-                <Text>{item}</Text>
-              </View>
-            )}
+            keyExtractor={(item) => item.userId}
+            renderItem={renderFriendItem}
             ListEmptyComponent={<Text>No friends</Text>}
           />
         )}
@@ -135,15 +149,7 @@ const FriendsScreen = () => {
           <FlatList
             data={searchResults}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.requestItem}>
-                <Text>{item.username}</Text>
-                <Button
-                  title="Send Request"
-                  onPress={() => handleSendRequest(item.id)}
-                />
-              </View>
-            )}
+            renderItem={renderSearchResultItem}
             ListEmptyComponent={<Text>No users found</Text>}
           />
         )}
