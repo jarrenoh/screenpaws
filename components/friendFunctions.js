@@ -1,48 +1,46 @@
-// friendFunctions.js
-import { auth, firestore } from '../firebase'; // Adjust the import as needed
+import { firebase, firestore } from '../firebase'; // Adjust the path as needed
 
-export const sendFriendRequest = async (toUserId) => {
-  const user = auth.currentUser;
-  if (user) {
-    const fromUserId = user.uid;
-    const requestRef = firestore.collection('users').doc(toUserId).collection('friendRequests').doc();
-    
-    await requestRef.set({
-      fromUserId: fromUserId,
-      status: 'pending'
+// Send Friend Request
+export const sendFriendRequest = async (currentUserId, targetUserId) => {
+  try {
+    const targetUserRef = firestore.collection('users').doc(targetUserId);
+    await targetUserRef.update({
+      friendRequests: firebase.firestore.FieldValue.arrayUnion(currentUserId),
     });
-
-    console.log('Friend request sent!');
-  } else {
-    console.error('User is not authenticated');
+    return true; // Indicate success
+  } catch (error) {
+    console.error('Error sending friend request:', error.message);
+    return false; // Indicate failure
   }
 };
 
-export const acceptFriendRequest = async (requestId, fromUserId) => {
-  const user = auth.currentUser;
-  if (user) {
-    const toUserId = user.uid;
+// Accept Friend Request
+export const acceptFriendRequest = async (currentUserId, targetUserId) => {
+  try {
+    const currentUserRef = firestore.collection('users').doc(currentUserId);
+    const targetUserRef = firestore.collection('users').doc(targetUserId);
 
-    // Update the friend request status
-    const requestRef = firestore.collection('users').doc(toUserId).collection('friendRequests').doc(requestId);
-    await requestRef.update({
-      status: 'accepted'
+    await currentUserRef.update({
+      friends: firebase.firestore.FieldValue.arrayUnion(targetUserId),
+      friendRequests: firebase.firestore.FieldValue.arrayRemove(targetUserId),
     });
 
-    // Add each user to the other's friends list
-    const userFriendsRef = firestore.collection('users').doc(toUserId).collection('friends').doc(fromUserId);
-    const friendFriendsRef = firestore.collection('users').doc(fromUserId).collection('friends').doc(toUserId);
-
-    await userFriendsRef.set({
-      status: 'accepted'
+    await targetUserRef.update({
+      friends: firebase.firestore.FieldValue.arrayUnion(currentUserId),
     });
 
-    await friendFriendsRef.set({
-      status: 'accepted'
-    });
-
-    console.log('Friend request accepted!');
-  } else {
-    console.error('User is not authenticated');
+    return true; // Indicate success
+  } catch (error) {
+    console.error('Error accepting friend request:', error.message);
+    return false; // Indicate failure
   }
+};
+
+// Reject Friend Request
+export const rejectFriendRequest = async (currentUserId, targetUserId) => {
+  const currentUserRef = firestore().collection('users').doc(currentUserId);
+
+  await currentUserRef.update({
+    friendRequests: firebase.firestore.FieldValue.arrayRemove(targetUserId),
+  });
 };
