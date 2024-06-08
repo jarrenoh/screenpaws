@@ -6,7 +6,8 @@ import CustomNavbar from '../components/CustomNavbar';
 
 const FriendsScreen = () => {
   const [friends, setFriends] = useState([]);
-  const [friendRequests, setFriendRequests] = useState([]);
+  const [receivedRequests, setReceivedRequests] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]);
   const [loadingFriends, setLoadingFriends] = useState(true);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,23 +28,32 @@ const FriendsScreen = () => {
       if (userDoc.exists) {
         const userData = userDoc.data();
 
+        // Fetch friends
         const friendsData = userData.friends || [];
         const friendPromises = friendsData.map(async (userId) => {
           const userSnapshot = await firestore.collection('users').doc(userId).get();
           return { userId, username: userSnapshot.data().username };
         });
-
         const resolvedFriends = await Promise.all(friendPromises);
         setFriends(resolvedFriends);
 
-        const requests = userData.friendRequests || [];
-        const requestPromises = requests.map(async (userId) => {
+        // Fetch received friend requests
+        const receivedRequestsData = userData.friendRequests || [];
+        const receivedRequestsPromises = receivedRequestsData.map(async (userId) => {
           const userSnapshot = await firestore.collection('users').doc(userId).get();
           return { userId, username: userSnapshot.data().username };
         });
+        const resolvedReceivedRequests = await Promise.all(receivedRequestsPromises);
+        setReceivedRequests(resolvedReceivedRequests);
 
-        const resolvedRequests = await Promise.all(requestPromises);
-        setFriendRequests(resolvedRequests);
+        // Fetch sent friend requests
+        const sentRequestsData = userData.sentRequests || [];
+        const sentRequestsPromises = sentRequestsData.map(async (userId) => {
+          const userSnapshot = await firestore.collection('users').doc(userId).get();
+          return { userId, username: userSnapshot.data().username };
+        });
+        const resolvedSentRequests = await Promise.all(sentRequestsPromises);
+        setSentRequests(resolvedSentRequests);
       }
 
       setLoadingFriends(false);
@@ -74,18 +84,24 @@ const FriendsScreen = () => {
           const userSnapshot = await firestore.collection('users').doc(userId).get();
           return { userId, username: userSnapshot.data().username };
         });
-
         const resolvedFriends = await Promise.all(friendPromises);
         setFriends(resolvedFriends);
 
-        const requests = userData.friendRequests || [];
-        const requestPromises = requests.map(async (userId) => {
+        const receivedRequestsData = userData.friendRequests || [];
+        const receivedRequestsPromises = receivedRequestsData.map(async (userId) => {
           const userSnapshot = await firestore.collection('users').doc(userId).get();
           return { userId, username: userSnapshot.data().username };
         });
+        const resolvedReceivedRequests = await Promise.all(receivedRequestsPromises);
+        setReceivedRequests(resolvedReceivedRequests);
 
-        const resolvedRequests = await Promise.all(requestPromises);
-        setFriendRequests(resolvedRequests);
+        const sentRequestsData = userData.sentRequests || [];
+        const sentRequestsPromises = sentRequestsData.map(async (userId) => {
+          const userSnapshot = await firestore.collection('users').doc(userId).get();
+          return { userId, username: userSnapshot.data().username };
+        });
+        const resolvedSentRequests = await Promise.all(sentRequestsPromises);
+        setSentRequests(resolvedSentRequests);
       }
     } catch (error) {
       console.error('Error accepting friend request:', error.message);
@@ -118,7 +134,7 @@ const FriendsScreen = () => {
       const success = await sendFriendRequest(currentUserId, targetUserId);
       if (success) {
         // Add the newly sent request to the local state
-        setFriendRequests(prevRequests => [...prevRequests, { userId: targetUserId, username: '' }]); // Update with actual username if available
+        setSentRequests(prevRequests => [...prevRequests, { userId: targetUserId, username: '' }]); // Update with actual username if available
         alert('Friend request sent successfully!');
       } else {
         alert('Failed to send friend request. Please try again later.');
@@ -129,13 +145,19 @@ const FriendsScreen = () => {
     }
   };
 
-  const renderFriendRequestItem = ({ item }) => (
+  const renderReceivedRequestItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text>{item.username}</Text>
       <Button
         title="Accept"
         onPress={() => handleAcceptRequest(item.userId)}
       />
+    </View>
+  );
+
+  const renderSentRequestItem = ({ item }) => (
+    <View style={styles.requestItem}>
+      <Text>{item.username} (Request Sent)</Text>
     </View>
   );
 
@@ -158,15 +180,27 @@ const FriendsScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Text style={styles.text}>Friend Requests</Text>
+        <Text style={styles.text}>Received Friend Requests</Text>
         {loadingRequests ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
           <FlatList
-            data={friendRequests}
+            data={receivedRequests}
             keyExtractor={(item) => item.userId}
-            renderItem={renderFriendRequestItem}
-            ListEmptyComponent={<Text>No friend requests</Text>}
+            renderItem={renderReceivedRequestItem}
+            ListEmptyComponent={<Text>No received friend requests</Text>}
+          />
+        )}
+
+        <Text style={styles.text}>Sent Friend Requests</Text>
+        {loadingRequests ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <FlatList
+            data={sentRequests}
+            keyExtractor={(item) => item.userId}
+            renderItem={renderSentRequestItem}
+            ListEmptyComponent={<Text>No sent friend requests</Text>}
           />
         )}
 

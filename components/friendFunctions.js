@@ -4,15 +4,25 @@ import { firebase, firestore } from '../firebase'; // Adjust the path as needed
 export const sendFriendRequest = async (currentUserId, targetUserId) => {
   try {
     const targetUserRef = firestore.collection('users').doc(targetUserId);
-    await targetUserRef.update({
+    const currentUserRef = firestore.collection('users').doc(currentUserId);
+    const batch = firestore.batch();
+
+    batch.update(targetUserRef, {
       friendRequests: firebase.firestore.FieldValue.arrayUnion(currentUserId),
     });
+
+    batch.update(currentUserRef, {
+      sentRequests: firebase.firestore.FieldValue.arrayUnion(targetUserId),
+    });
+
+    await batch.commit();
     return true; // Indicate success
   } catch (error) {
     console.error('Error sending friend request:', error.message);
     return false; // Indicate failure
   }
 };
+
 
 // Accept Friend Request
 export const acceptFriendRequest = async (currentUserId, fromUserId) => {
