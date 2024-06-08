@@ -157,7 +157,7 @@ const FriendsScreen = () => {
 
   const renderSentRequestItem = ({ item }) => (
     <View style={styles.requestItem}>
-      <Text>{item.username} (Request Sent)</Text>
+      <Text>{item.username} (Pending) </Text>
     </View>
   );
 
