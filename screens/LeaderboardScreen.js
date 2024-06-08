@@ -1,57 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { firestore, auth } from '../firebase'; // Importing firestore and auth from your firebase setup
-import CustomNavbar from '../components/CustomNavbar'; // Importing your custom navbar component
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { firestore } from '../firebase'; // Assuming you're using firestore directly for fetching data
+import CustomNavbar from '../components/CustomNavbar';
 
-const LeaderboardScreen = ({ route }) => {
+const LeaderboardScreen = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch leaderboard data based on the route parameter (global or friends)
-    if (route.params && route.params.type === 'global') {
-      fetchGlobalLeaderboard();
-    } else if (route.params && route.params.type === 'friends') {
-      fetchFriendsLeaderboard();
-    }
-  }, [route]);
+    setLoading(true);
+    fetchLeaderboardData();
+  }, []);
 
-  const fetchGlobalLeaderboard = async () => {
+  const fetchLeaderboardData = async () => {
     try {
-      const snapshot = await firestore.collection('users').orderBy('xp', 'desc').limit(10).get();
+      const snapshot = await firestore.collection('users').orderBy('xp', 'desc').get();
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setLeaderboardData(data);
-      console.log('Global leaderboard data:', data);
+      setLoading(false);
     } catch (error) {
-      console.error('Error fetching global leaderboard:', error.message);
-    }
-  };
-
-  const fetchFriendsLeaderboard = async () => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) return;
-
-    try {
-      // Retrieve the user's friend list from Firestore
-      const userDoc = await firestore.collection('users').doc(currentUser.uid).get();
-      const userData = userDoc.data();
-      const friendUserIds = userData.friends || []; // Assuming friends are stored as user IDs
-
-      // Fetch the user data for each friend
-      const friendPromises = friendUserIds.map(async (friendUserId) => {
-        const friendUserDoc = await firestore.collection('users').doc(friendUserId).get();
-        return friendUserDoc.data();
-      });
-
-      // Wait for all friend data to be fetched
-      const friendData = await Promise.all(friendPromises);
-
-      // Sort the friend data by XP or level to create the leaderboard
-      const sortedFriendData = friendData.sort((a, b) => b.xp - a.xp); // Sort by XP (change to level if needed)
-
-      // Now you have the friends' leaderboard data in sortedFriendData
-      setLeaderboardData(sortedFriendData);
-    } catch (error) {
-      console.error('Error fetching friends leaderboard:', error.message);
+      console.error('Error fetching leaderboard data:', error.message);
+      setLoading(false);
     }
   };
 
@@ -66,11 +35,15 @@ const LeaderboardScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={leaderboardData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={leaderboardData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+      )}
       <CustomNavbar />
     </View>
   );
