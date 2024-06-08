@@ -20,13 +20,32 @@ const FriendsScreen = () => {
     const fetchFriendsAndRequests = async () => {
       setLoadingFriends(true);
       setLoadingRequests(true);
+
       const userRef = firestore.collection('users').doc(currentUserId);
       const userDoc = await userRef.get();
+
       if (userDoc.exists) {
         const userData = userDoc.data();
-        setFriends(userData.friends || []);
-        setFriendRequests(userData.friendRequests || []);
+
+        const friendsData = userData.friends || [];
+        const friendPromises = friendsData.map(async (userId) => {
+          const userSnapshot = await firestore.collection('users').doc(userId).get();
+          return { userId, username: userSnapshot.data().username };
+        });
+
+        const resolvedFriends = await Promise.all(friendPromises);
+        setFriends(resolvedFriends);
+
+        const requests = userData.friendRequests || [];
+        const requestPromises = requests.map(async (userId) => {
+          const userSnapshot = await firestore.collection('users').doc(userId).get();
+          return { userId, username: userSnapshot.data().username };
+        });
+
+        const resolvedRequests = await Promise.all(requestPromises);
+        setFriendRequests(resolvedRequests);
       }
+
       setLoadingFriends(false);
       setLoadingRequests(false);
     };
@@ -35,20 +54,48 @@ const FriendsScreen = () => {
   }, [currentUserId]);
 
   const handleAcceptRequest = async (fromUserId) => {
-    await acceptFriendRequest(currentUserId, fromUserId);
-    // Refresh the lists after accepting a request
-    const userRef = firestore.collection('users').doc(currentUserId);
-    const userDoc = await userRef.get();
-    if (userDoc.exists) {
-      const userData = userDoc.data();
-      setFriends(userData.friends || []);
-      setFriendRequests(userData.friendRequests || []);
+    if (!fromUserId) {
+      console.error('Error accepting friend request: fromUserId is undefined');
+      return;
+    }
+
+    try {
+      await acceptFriendRequest(currentUserId, fromUserId);
+
+      // Refresh the lists after accepting a request
+      const userRef = firestore.collection('users').doc(currentUserId);
+      const userDoc = await userRef.get();
+
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+
+        const friendsData = userData.friends || [];
+        const friendPromises = friendsData.map(async (userId) => {
+          const userSnapshot = await firestore.collection('users').doc(userId).get();
+          return { userId, username: userSnapshot.data().username };
+        });
+
+        const resolvedFriends = await Promise.all(friendPromises);
+        setFriends(resolvedFriends);
+
+        const requests = userData.friendRequests || [];
+        const requestPromises = requests.map(async (userId) => {
+          const userSnapshot = await firestore.collection('users').doc(userId).get();
+          return { userId, username: userSnapshot.data().username };
+        });
+
+        const resolvedRequests = await Promise.all(requestPromises);
+        setFriendRequests(resolvedRequests);
+      }
+    } catch (error) {
+      console.error('Error accepting friend request:', error.message);
     }
   };
 
   const handleSearch = async () => {
     if (!searchQuery) return;
     setLoadingSearch(true);
+
     const usersRef = firestore.collection('users');
     const querySnapshot = await usersRef
       .where('username', '>=', searchQuery)

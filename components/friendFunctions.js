@@ -15,25 +15,26 @@ export const sendFriendRequest = async (currentUserId, targetUserId) => {
 };
 
 // Accept Friend Request
-export const acceptFriendRequest = async (currentUserId, targetUserId) => {
-  try {
-    const currentUserRef = firestore.collection('users').doc(currentUserId);
-    const targetUserRef = firestore.collection('users').doc(targetUserId);
-
-    await currentUserRef.update({
-      friends: firebase.firestore.FieldValue.arrayUnion(targetUserId),
-      friendRequests: firebase.firestore.FieldValue.arrayRemove(targetUserId),
-    });
-
-    await targetUserRef.update({
-      friends: firebase.firestore.FieldValue.arrayUnion(currentUserId),
-    });
-
-    return true; // Indicate success
-  } catch (error) {
-    console.error('Error accepting friend request:', error.message);
-    return false; // Indicate failure
+export const acceptFriendRequest = async (currentUserId, fromUserId) => {
+  if (!currentUserId || !fromUserId) {
+    throw new Error('User IDs must be provided');
   }
+
+  const userRef = firestore.collection('users').doc(currentUserId);
+  const fromUserRef = firestore.collection('users').doc(fromUserId);
+
+  const batch = firestore.batch();
+
+  batch.update(userRef, {
+    friends: firebase.firestore.FieldValue.arrayUnion(fromUserId),
+    friendRequests: firebase.firestore.FieldValue.arrayRemove(fromUserId),
+  });
+
+  batch.update(fromUserRef, {
+    friends: firebase.firestore.FieldValue.arrayUnion(currentUserId),
+  });
+
+  await batch.commit();
 };
 
 // Reject Friend Request
