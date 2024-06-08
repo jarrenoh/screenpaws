@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, TextInput, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, Button, TextInput, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { firebase, firestore, auth } from '../firebase';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest } from '../components/friendFunctions';
 import CustomNavbar from '../components/CustomNavbar';
@@ -130,11 +130,22 @@ const FriendsScreen = () => {
   };
 
   const handleSendRequest = async (targetUserId) => {
+    if (sentRequests.some(request => request.userId === targetUserId)) {
+      alert('Friend request already sent to this user.');
+      return;
+    }
+
+    if (friends.some(friend => friend.userId === targetUserId)) {
+      alert('This user is already your friend.');
+      return;
+    }
+
     try {
       const success = await sendFriendRequest(currentUserId, targetUserId);
       if (success) {
         // Add the newly sent request to the local state
-        setSentRequests(prevRequests => [...prevRequests, { userId: targetUserId, username: '' }]); // Update with actual username if available
+        const userSnapshot = await firestore.collection('users').doc(targetUserId).get();
+        setSentRequests(prevRequests => [...prevRequests, { userId: targetUserId, username: userSnapshot.data().username }]);
         alert('Friend request sent successfully!');
       } else {
         alert('Failed to send friend request. Please try again later.');
@@ -180,7 +191,7 @@ const FriendsScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Text style={styles.text}>Received Friend Requests</Text>
+        <Text style={styles.sectionTitle}>Received Friend Requests</Text>
         {loadingRequests ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
@@ -188,11 +199,11 @@ const FriendsScreen = () => {
             data={receivedRequests}
             keyExtractor={(item) => item.userId}
             renderItem={renderReceivedRequestItem}
-            ListEmptyComponent={<Text>No received friend requests</Text>}
+            ListEmptyComponent={<Text style={styles.emptyText}>No received friend requests</Text>}
           />
         )}
 
-        <Text style={styles.text}>Sent Friend Requests</Text>
+        <Text style={styles.sectionTitle}>Sent Friend Requests</Text>
         {loadingRequests ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
@@ -200,11 +211,11 @@ const FriendsScreen = () => {
             data={sentRequests}
             keyExtractor={(item) => item.userId}
             renderItem={renderSentRequestItem}
-            ListEmptyComponent={<Text>No sent friend requests</Text>}
+            ListEmptyComponent={<Text style={styles.emptyText}>No sent friend requests</Text>}
           />
         )}
 
-        <Text style={styles.text}>Friends</Text>
+        <Text style={styles.sectionTitle}>Friends</Text>
         {loadingFriends ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
@@ -212,11 +223,11 @@ const FriendsScreen = () => {
             data={friends}
             keyExtractor={(item) => item.userId}
             renderItem={renderFriendItem}
-            ListEmptyComponent={<Text>No friends</Text>}
+            ListEmptyComponent={<Text style={styles.emptyText}>No friends</Text>}
           />
         )}
 
-        <Text style={styles.text}>Add Friends</Text>
+        <Text style={styles.sectionTitle}>Add Friends</Text>
         <TextInput
           style={styles.input}
           placeholder="Search for users"
@@ -231,7 +242,7 @@ const FriendsScreen = () => {
             data={searchResults}
             keyExtractor={(item) => item.id}
             renderItem={renderSearchResultItem}
-            ListEmptyComponent={<Text>No users found</Text>}
+            ListEmptyComponent={<Text style={styles.emptyText}>No users found</Text>}
           />
         )}
       </View>
@@ -320,5 +331,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
- 
