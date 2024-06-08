@@ -20,6 +20,7 @@ const LeaderboardScreen = ({ route }) => {
       const snapshot = await firestore.collection('users').orderBy('xp', 'desc').limit(10).get();
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setLeaderboardData(data);
+      console.log('Global leaderboard data:', data);
     } catch (error) {
       console.error('Error fetching global leaderboard:', error.message);
     }
