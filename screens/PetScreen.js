@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Text } from 'react-native';
+import { StyleSheet, View, Image, Text, Dimensions } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 import dog from '../assets/dog.png';
@@ -40,18 +40,23 @@ const PetScreen = () => {
     return isNaN(xpPercentage) ? 0 : xpPercentage;
   };
 
+  const xpBarContainerWidth = Dimensions.get('window').width * 0.8; // 80% of window width
+  const xpBarWidth = xpBarContainerWidth * (calculateXpPercentage() / 100);
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-      <Image source={level === 1 ? dog : level >= 5 ? swoledoge : placeholderImage} style={styles.image} />
+        <Image source={level === 1 ? dog : level >= 5 ? swoledoge : placeholderImage} style={styles.image} />
         <Text style={styles.text}>
           {level === 1 ? 'Hungry Dog' : level >= 2 && level <= 5 ? 'Weak Doge' : 'Swole Doge'}
         </Text>
         <Text style={styles.text}>XP: {xp}</Text>
         <Text style={styles.text}>Level: {level}</Text>
         <View style={styles.xpBarContainer}>
-          <View style={[styles.xpBar, { width: `${calculateXpPercentage()}%` }]} />
-        </View>
+          <View style={[styles.xpBar, { flex: calculateXpPercentage() / 100 }]} />
+          <View style={{ flex: 1 - calculateXpPercentage() / 100 }} />
+          <Text style={styles.xpText}>Progress: {calculateXpPercentage().toFixed(0)}%</Text>
+      </View>
       </View>
       <View style={styles.navbarContainer}>
         <CustomNavbar />
@@ -84,16 +89,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   xpBarContainer: {
+    flexDirection: 'row',
     width: '80%',
     height: 20,
     backgroundColor: '#e0e0e0',
     borderRadius: 10,
     marginTop: 20,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   xpBar: {
     height: '100%',
-    backgroundColor: '#76c7c0'
+    backgroundColor: '#76c7c0',
+  },
+  xpText: {
+    position: 'absolute',
+    color: 'black',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   navbarContainer: {
     position: 'absolute',
@@ -101,4 +115,3 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 });
-
