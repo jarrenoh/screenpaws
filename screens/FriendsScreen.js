@@ -156,6 +156,23 @@ const FriendsScreen = () => {
     }
   };
 
+  const handleRemoveFriend = async (friendId) => {
+    try {
+      // Remove friend from Firestore
+      const userRef = firestore.collection('users').doc(currentUserId);
+      await userRef.update({
+        friends: firebase.firestore.FieldValue.arrayRemove(friendId)
+      });
+
+      // Update local state
+      setFriends(prevFriends => prevFriends.filter(friend => friend.userId !== friendId));
+      Alert.alert('Success', 'Friend removed successfully!');
+    } catch (error) {
+      console.error('Error removing friend:', error.message);
+      Alert.alert('Error', 'Failed to remove friend. Please try again later.');
+    }
+  };
+
   const renderReceivedRequestItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text>{item.username}</Text>
@@ -175,6 +192,10 @@ const FriendsScreen = () => {
   const renderFriendItem = ({ item }) => (
     <View style={styles.friendItem}>
       <Text>{item.username}</Text>
+      <Button
+        title="Remove"
+        onPress={() => handleRemoveFriend(item.userId)}
+      />
     </View>
   );
 
