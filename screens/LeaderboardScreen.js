@@ -6,7 +6,7 @@ import CustomNavbar from '../components/CustomNavbar';
 const LeaderboardScreen = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const currentUserId = auth.currentUser?.uid;
+  const currentUserId = auth.currentUser?.uid; // Replace this with the actual current user ID
 
   useEffect(() => {
     fetchLeaderboardData();
@@ -33,10 +33,19 @@ const LeaderboardScreen = () => {
 
   const renderItem = ({ item, index }) => (
     <View style={[styles.item, item.id === currentUserId && styles.highlightedItem]}>
-      <Text style={styles.rank}>{index + 1}</Text>
-      <Text style={styles.username}>{item.username}</Text>
-      <Text style={styles.level}>Level {item.level}</Text>
-      <Text style={styles.xp}>{item.xp} XP</Text>
+      <View style={styles.userInfo}>
+        <Text style={styles.rank}>{index + 1}</Text>
+        <View style={styles.usernameContainer}>
+          <Text style={styles.username}>{item.username}</Text>
+          {index === 0 && <Text style={styles.specialText}>10k Aura</Text>}
+          {index === 1 && <Text style={styles.specialText}>Locked In</Text>}
+          {index === 2 && <Text style={styles.specialText}>Almost There</Text>}
+        </View>
+      </View>
+      <View style={styles.userStats}>
+        <Text style={styles.level}>Level {item.level}</Text>
+        <Text style={styles.xp}>{item.xp} XP</Text>
+      </View>
     </View>
   );
 
@@ -85,25 +94,35 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   highlightedItem: {
-    backgroundColor: '#dff0d8', // Highlight color for current user
+    backgroundColor: '#7DF9FF', // Highlight color for current user
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  usernameContainer: {
+    marginLeft: 10,
   },
   rank: {
     fontWeight: 'bold',
     fontSize: 18,
   },
   username: {
-    flex: 1,
-    marginLeft: 10,
     fontSize: 18,
+  },
+  specialText: {
+    fontSize: 14,
+    color: '#888',
+  },
+  userStats: {
+    alignItems: 'flex-end',
   },
   level: {
     fontWeight: 'bold',
-    marginLeft: 10,
     fontSize: 18,
   },
   xp: {
     fontWeight: 'bold',
-    marginLeft: 10,
     fontSize: 18,
   },
 });
