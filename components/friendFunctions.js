@@ -58,9 +58,14 @@ export const acceptFriendRequest = async (currentUserId, fromUserId) => {
 export const rejectFriendRequest = async (currentUserId, fromUserId) => {
   try {
     const currentUserRef = firestore.collection('users').doc(currentUserId);
+    const fromUserRef = firestore.collection('users').doc(fromUserId);
 
     await currentUserRef.update({
       friendRequests: firebase.firestore.FieldValue.arrayRemove(fromUserId),
+    });
+
+    await fromUserRef.update({
+      sentRequests: firebase.firestore.FieldValue.arrayRemove(currentUserId),
     });
 
     return true;

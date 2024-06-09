@@ -63,6 +63,40 @@ const FriendsScreen = () => {
     fetchFriendsAndRequests();
   }, [currentUserId]);
 
+  const handleRejectRequest = async (fromUserId) => {
+    if (!fromUserId) {
+      console.error('Error rejecting friend request: fromUserId is undefined');
+      return;
+    }
+  
+    try {
+      const success = await rejectFriendRequest(currentUserId, fromUserId);
+      if (success) {
+        // Remove the rejected request from the local state
+        setReceivedRequests(prevRequests => prevRequests.filter(request => request.userId !== fromUserId));
+        
+        // Fetch the updated list of received requests
+        const updatedUserDoc = await firestore.collection('users').doc(currentUserId).get();
+        const updatedReceivedRequests = updatedUserDoc.data().friendRequests || [];
+        
+        // Map the received requests to include usernames
+        const updatedReceivedRequestsData = await Promise.all(updatedReceivedRequests.map(async (userId) => {
+          const userSnapshot = await firestore.collection('users').doc(userId).get();
+          return { userId, username: userSnapshot.data().username };
+        }));
+        
+        // Update the state with the updated received requests list
+        setReceivedRequests(updatedReceivedRequestsData);
+  
+        Alert.alert('Success', 'Friend request rejected!');
+      }
+    } catch (error) {
+      console.error('Error rejecting friend request:', error.message);
+      Alert.alert('Error', 'Failed to reject friend request. Please try again later.');
+    }
+  };
+  
+
   const handleAcceptRequest = async (fromUserId) => {
     if (!fromUserId) {
       console.error('Error accepting friend request: fromUserId is undefined');
@@ -169,6 +203,10 @@ const FriendsScreen = () => {
       <Button
         title="Accept"
         onPress={() => handleAcceptRequest(item.userId)}
+      />
+      <Button
+        title="Reject"
+        onPress={() => handleRejectRequest(item.userId)}
       />
     </View>
   );
