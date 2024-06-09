@@ -70,19 +70,20 @@ const FriendsScreen = () => {
     }
 
     try {
-      await acceptFriendRequest(currentUserId, fromUserId);
+      const success = await acceptFriendRequest(currentUserId, fromUserId);
+      if (success) {
+        // Find the username of the accepted friend request
+        const acceptedRequest = receivedRequests.find(user => user.userId === fromUserId);
 
-      // Find the username of the accepted friend request
-      const acceptedRequest = receivedRequests.find(user => user.userId === fromUserId);
+        // Update friends and received requests state
+        setFriends(prevFriends => [
+          ...prevFriends, 
+          { userId: fromUserId, username: acceptedRequest ? acceptedRequest.username : 'Unknown' }
+        ]);
+        setReceivedRequests(prevRequests => prevRequests.filter(request => request.userId !== fromUserId));
 
-      // Update friends and received requests state
-      setFriends(prevFriends => [
-        ...prevFriends, 
-        { userId: fromUserId, username: acceptedRequest ? acceptedRequest.username : 'Unknown' }
-      ]);
-      setReceivedRequests(prevRequests => prevRequests.filter(request => request.userId !== fromUserId));
-
-      Alert.alert('Success', 'Friend request accepted!');
+        Alert.alert('Success', 'Friend request accepted!');
+      }
     } catch (error) {
       console.error('Error accepting friend request:', error.message);
       Alert.alert('Error', 'Failed to accept friend request. Please try again later.');
