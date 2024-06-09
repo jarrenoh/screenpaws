@@ -72,61 +72,21 @@ const FriendsScreen = () => {
     try {
       await acceptFriendRequest(currentUserId, fromUserId);
 
-      // Refresh the lists after accepting a request
-      const userRef = firestore.collection('users').doc(currentUserId);
-      const userDoc = await userRef.get();
+      // Find the username of the accepted friend request
+      const acceptedRequest = receivedRequests.find(user => user.userId === fromUserId);
 
-      if (userDoc.exists) {
-        const userData = userDoc.data();
+      // Update friends and received requests state
+      setFriends(prevFriends => [
+        ...prevFriends, 
+        { userId: fromUserId, username: acceptedRequest ? acceptedRequest.username : 'Unknown' }
+      ]);
+      setReceivedRequests(prevRequests => prevRequests.filter(request => request.userId !== fromUserId));
 
-        const friendsData = userData.friends || [];
-        const friendPromises = friendsData.map(async (userId) => {
-          const userSnapshot = await firestore.collection('users').doc(userId).get();
-          return { userId, username: userSnapshot.data().username };
-        });
-        const resolvedFriends = await Promise.all(friendPromises);
-        setFriends(resolvedFriends);
-
-        const receivedRequestsData = userData.friendRequests || [];
-        const receivedRequestsPromises = receivedRequestsData.map(async (userId) => {
-          const userSnapshot = await firestore.collection('users').doc(userId).get();
-          return { userId, username: userSnapshot.data().username };
-        });
-        const resolvedReceivedRequests = await Promise.all(receivedRequestsPromises);
-        setReceivedRequests(resolvedReceivedRequests);
-
-        const sentRequestsData = userData.sentRequests || [];
-        const sentRequestsPromises = sentRequestsData.map(async (userId) => {
-          const userSnapshot = await firestore.collection('users').doc(userId).get();
-          return { userId, username: userSnapshot.data().username };
-        });
-        const resolvedSentRequests = await Promise.all(sentRequestsPromises);
-        setSentRequests(resolvedSentRequests);
-      }
+      Alert.alert('Success', 'Friend request accepted!');
     } catch (error) {
       console.error('Error accepting friend request:', error.message);
+      Alert.alert('Error', 'Failed to accept friend request. Please try again later.');
     }
-  };
-
-  const handleSearch = async () => {
-    if (!searchQuery) return;
-    setLoadingSearch(true);
-
-    const usersRef = firestore.collection('users');
-    const querySnapshot = await usersRef
-      .where('username', '>=', searchQuery)
-      .where('username', '<=', searchQuery + '\uf8ff')
-      .get();
-
-    const results = [];
-    querySnapshot.forEach(doc => {
-      if (doc.id !== currentUserId) {
-        results.push({ id: doc.id, ...doc.data() });
-      }
-    });
-
-    setSearchResults(results);
-    setLoadingSearch(false);
   };
 
   const handleSendRequest = async (targetUserId) => {
@@ -158,11 +118,19 @@ const FriendsScreen = () => {
 
   const handleRemoveFriend = async (friendId) => {
     try {
-      // Remove friend from Firestore
-      const userRef = firestore.collection('users').doc(currentUserId);
-      await userRef.update({
-        friends: firebase.firestore.FieldValue.arrayRemove(friendId)
+      const batch = firestore.batch();
+      const currentUserRef = firestore.collection('users').doc(currentUserId);
+      const friendUserRef = firestore.collection('users').doc(friendId);
+
+      batch.update(currentUserRef, {
+        friends: firebase.firestore.FieldValue.arrayRemove(friendId),
       });
+
+      batch.update(friendUserRef, {
+        friends: firebase.firestore.FieldValue.arrayRemove(currentUserId),
+      });
+
+      await batch.commit();
 
       // Update local state
       setFriends(prevFriends => prevFriends.filter(friend => friend.userId !== friendId));
@@ -171,6 +139,27 @@ const FriendsScreen = () => {
       console.error('Error removing friend:', error.message);
       Alert.alert('Error', 'Failed to remove friend. Please try again later.');
     }
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery) return;
+    setLoadingSearch(true);
+
+    const usersRef = firestore.collection('users');
+    const querySnapshot = await usersRef
+      .where('username', '>=', searchQuery)
+      .where('username', '<=', searchQuery + '\uf8ff')
+      .get();
+
+    const results = [];
+    querySnapshot.forEach(doc => {
+      if (doc.id !== currentUserId) {
+        results.push({ id: doc.id, ...doc.data() });
+      }
+    });
+
+    setSearchResults(results);
+    setLoadingSearch(false);
   };
 
   const renderReceivedRequestItem = ({ item }) => (
@@ -194,6 +183,7 @@ const FriendsScreen = () => {
       <Text>{item.username}</Text>
       <Button
         title="Remove"
+        color="red"
         onPress={() => handleRemoveFriend(item.userId)}
       />
     </View>
@@ -312,6 +302,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
     width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   input: {
     height: 40,
