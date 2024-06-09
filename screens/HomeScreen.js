@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image, TextInput, AppState } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Image, AppState } from 'react-native';
 import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
 import CustomNavbar from '../components/CustomNavbar';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import Slider from '@react-native-community/slider';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const [timeInput, setTimeInput] = useState('');
   const [countdownTime, setCountdownTime] = useState(0);
   const [initialCountdownTime, setInitialCountdownTime] = useState(0); // New state to track the initial countdown time
   const [timerActive, setTimerActive] = useState(false);
@@ -98,20 +99,10 @@ const HomeScreen = () => {
     setTimerActive(prevState => !prevState);
   };
 
-  const handleResetTimer = () => {
-    setCountdownTime(0);
-    setTimerActive(false);
-  };
-
-  const handleSetTime = () => {
-    const timeInSeconds = parseInt(timeInput) * 60;
-    if (isNaN(timeInSeconds) || timeInSeconds <= 0 || timeInSeconds > 7200) {
-      alert('Please enter a valid time in minutes (1-120)');
-      return;
-    }
+  const handleSetTime = (value) => {
+    const timeInSeconds = value * 60;
     setCountdownTime(timeInSeconds);
     setInitialCountdownTime(timeInSeconds); // Set the initial countdown time
-    setTimeInput('');
   };
 
   useEffect(() => {
@@ -140,29 +131,39 @@ const HomeScreen = () => {
         <Image source={pawLogo} style={[styles.image, styles.imageMargin]} />
         <Text>Welcome {auth.currentUser?.displayName}!</Text>
         <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter time in minutes"
-          keyboardType="numeric"
-          value={timeInput}
-          onChangeText={setTimeInput}
+        
+
+        <AnimatedCircularProgress
+          size={200}
+          width={10}
+          fill={(countdownTime / initialCountdownTime) * 100}
+          tintColor="#00e0ff"
+          backgroundColor="#3d5875"
+        >
+          {
+            () => (
+              <Text style={styles.timer}>{formatTime(countdownTime)}</Text>
+            )
+          }
+        </AnimatedCircularProgress>
+        <Slider
+          style={styles.slider}
+          minimumValue={5}
+          maximumValue={120}
+          step={5}
+          value={countdownTime / 60}
+          onValueChange={handleSetTime}
+          minimumTrackTintColor="#1fb28a"
+          maximumTrackTintColor="#d3d3d3"
+          thumbTintColor="#b9e4c9"
         />
-        <TouchableOpacity onPress={handleSetTime} style={[styles.button, styles.setButton]}>
-          <Text style={styles.buttonText}>Set Time</Text>
-        </TouchableOpacity>
-        <Text style={styles.timer}>{formatTime(countdownTime)}</Text>
         <TouchableOpacity
           onPress={handleToggleTimer}
           style={[styles.button, timerActive ? styles.stopButton : styles.startButton]}
         >
           <Text style={styles.buttonText}>{timerActive ? 'Stop' : 'Start'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleResetTimer}
-          style={[styles.button, styles.resetButton]}
-        >
-          <Text style={styles.buttonText}>Reset</Text>
-        </TouchableOpacity>
+        
         <TouchableOpacity
           onPress={handleLogout}
           style={styles.button}
@@ -221,14 +222,8 @@ const styles = StyleSheet.create({
   imageMargin: {
     marginBottom: 20,
   },
-  input: {
+  slider: {
+    width: '80%',
     height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    marginTop: 20,
-    width: '60%',
-    borderRadius: 10,
-    textAlign: 'center',
   },
 });
