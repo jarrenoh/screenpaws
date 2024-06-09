@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, TextInput, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, FlatList, ActivityIndicator, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { firebase, firestore, auth } from '../firebase';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest } from '../components/friendFunctions';
 import CustomNavbar from '../components/CustomNavbar';
@@ -200,18 +200,18 @@ const FriendsScreen = () => {
   const renderReceivedRequestItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text>{item.username}</Text>
-      <View style={styles.acceptButton}>
-        <Button
-          title="Accept"
-          color="green"
-          onPress={() => handleAcceptRequest(item.userId)}
-        />
-      </View>
-      <Button
-        title="Reject"
-        color="red"
+      <TouchableOpacity 
+        style={styles.roundedButton1} 
+        onPress={() => handleAcceptRequest(item.userId)}
+      >
+        <Text style={styles.buttonText}>Accept</Text>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.roundedButton2} 
         onPress={() => handleRejectRequest(item.userId)}
-      />
+      >
+        <Text style={styles.buttonText}>Reject</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -224,21 +224,24 @@ const FriendsScreen = () => {
   const renderFriendItem = ({ item }) => (
     <View style={styles.friendItem}>
       <Text>{item.username}</Text>
-      <Button
-        title="Remove"
-        color="red"
+      <TouchableOpacity 
+        style={styles.roundedButton2} 
         onPress={() => handleRemoveFriend(item.userId)}
-      />
+      >
+        <Text style={styles.buttonText}>Remove</Text>
+      </TouchableOpacity>
     </View>
   );
 
   const renderSearchResultItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text>{item.username}</Text>
-      <Button
-        title="Send Request"
+      <TouchableOpacity 
+        style={styles.roundedButton3} 
         onPress={() => handleSendRequest(item.id)}
-      />
+      >
+        <Text style={styles.buttonText}>Send Request</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -288,7 +291,12 @@ const FriendsScreen = () => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <Button title="Search" onPress={handleSearch} />
+        <TouchableOpacity 
+        style={styles.roundedButton} 
+        onPress={handleSearch}
+        >
+        <Text style={styles.buttonText}>Search</Text>
+        </TouchableOpacity>
         {loadingSearch ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
@@ -334,9 +342,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     width: '100%',
   },
-  acceptButton: {
-    marginRight: -150,
-  },
   friendItem: {
     padding: 15,
     marginVertical: 5,
@@ -378,12 +383,29 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: '#3949ab',
   },
-  button: {
-    marginTop: 10,
-    backgroundColor: '#3949ab',
-    padding: 10,
-    borderRadius: 8,
+  roundedButton1: {
+    justifyContent: 'center',
     alignItems: 'center',
+    padding: 10,
+    borderRadius: 20, // This makes the button rounded
+    backgroundColor: 'green', // Change this to your desired button color
+    marginRight: -150, // Adjust this value as needed
+  },
+  roundedButton2: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 20, // This makes the button rounded
+    backgroundColor: 'red', // Change this to your desired button color
+    marginRight: 5, // Adjust this value as needed
+  },
+  roundedButton3: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 20, // This makes the button rounded
+    backgroundColor: '#007BFF', // Change this to your desired button color
+    marginRight: 5, // Adjust this value as needed
   },
   buttonText: {
     color: '#fff',
