@@ -8,12 +8,12 @@ const LeaderboardScreen = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
     fetchLeaderboardData();
   }, []);
 
   const fetchLeaderboardData = async () => {
     try {
+      setLoading(true);
       const snapshot = await firestore.collection('users').orderBy('xp', 'desc').get();
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setLeaderboardData(data);
@@ -35,6 +35,7 @@ const LeaderboardScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Leaderboard</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
@@ -52,12 +53,19 @@ const LeaderboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#fff', // Adjust background color as needed
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 10,
   },
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
@@ -65,18 +73,22 @@ const styles = StyleSheet.create({
   },
   rank: {
     fontWeight: 'bold',
+    fontSize: 16,
   },
   username: {
     flex: 1,
     marginLeft: 10,
+    fontSize: 16,
   },
   level: {
     fontWeight: 'bold',
     marginLeft: 10,
+    fontSize: 16,
   },
   xp: {
     fontWeight: 'bold',
     marginLeft: 10,
+    fontSize: 16,
   },
 });
 
