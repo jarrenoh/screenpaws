@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image, AppState } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View, Image, AppState } from 'react-native';
 import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
@@ -112,6 +112,14 @@ const HomeScreen = () => {
       updateElapsedTimeInFirestore(newElapsedTime);
       setElapsedTime(newElapsedTime);
       setTimerActive(false);
+
+      Alert.alert(
+        "Timer Finished",
+        "Your countdown timer has reached zero!",
+        [
+          { text: "OK", onPress: () => console.log("OK Pressed") }
+        ]
+      );
     }
   }, [countdownTime, timerActive]);
 
