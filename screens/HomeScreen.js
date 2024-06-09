@@ -9,6 +9,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [timeInput, setTimeInput] = useState('');
   const [countdownTime, setCountdownTime] = useState(0);
+  const [initialCountdownTime, setInitialCountdownTime] = useState(0); // New state to track the initial countdown time
   const [timerActive, setTimerActive] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -33,11 +34,8 @@ const HomeScreen = () => {
     if (timerActive && countdownTime > 0) {
       intervalRef.current = setInterval(() => {
         const currentTime = Date.now();
-        const newElapsedTime = elapsedTime + Math.floor((currentTime - startTime) / 1000);
-        setElapsedTime(newElapsedTime);
         setStartTime(currentTime); // Reset the start time for the next interval
         setCountdownTime(prevTime => prevTime - 1);
-        updateElapsedTimeInFirestore(newElapsedTime); // Update elapsed time in Firestore
       }, 1000);
     } else {
       clearInterval(intervalRef.current);
@@ -112,8 +110,19 @@ const HomeScreen = () => {
       return;
     }
     setCountdownTime(timeInSeconds);
+    setInitialCountdownTime(timeInSeconds); // Set the initial countdown time
     setTimeInput('');
   };
+
+  useEffect(() => {
+    if (countdownTime === 0 && timerActive) {
+      // Only update elapsed time if the timer was active and reached zero
+      const newElapsedTime = elapsedTime + initialCountdownTime;
+      updateElapsedTimeInFirestore(newElapsedTime);
+      setElapsedTime(newElapsedTime);
+      setTimerActive(false);
+    }
+  }, [countdownTime, timerActive]);
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
@@ -160,7 +169,6 @@ const HomeScreen = () => {
         >
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
-        
       </View>
       <CustomNavbar />
     </View>
