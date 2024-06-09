@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   highlightedItem: {
-    backgroundColor: '#dff0d8', // Highlight color for current user
+    backgroundColor: '#7DF9FF', // Highlight color for current user
   },
   userInfo: {
     flexDirection: 'row',
