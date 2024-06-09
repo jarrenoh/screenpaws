@@ -16,6 +16,12 @@ const LeaderboardScreen = () => {
       setLoading(true);
       const snapshot = await firestore.collection('users').orderBy('xp', 'desc').get();
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      data.sort((a, b) => {
+        if (a.xp === b.xp) {
+          return a.username.localeCompare(b.username);
+        }
+        return 0;
+      });
       setLeaderboardData(data);
       setLoading(false);
     } catch (error) {
