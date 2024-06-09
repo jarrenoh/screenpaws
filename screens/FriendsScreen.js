@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, FlatList, ActivityIndicator, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, FlatList, ActivityIndicator, StyleSheet, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
 import { firebase, firestore, auth } from '../firebase';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest } from '../components/friendFunctions';
 import CustomNavbar from '../components/CustomNavbar';
@@ -246,7 +246,7 @@ const FriendsScreen = () => {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <Text style={styles.sectionTitle}>Received Friend Requests</Text>
         {loadingRequests ? (
@@ -309,7 +309,7 @@ const FriendsScreen = () => {
         )}
       </View>
       <CustomNavbar />
-    </View>
+    </SafeAreaView>
   );
 };
 
