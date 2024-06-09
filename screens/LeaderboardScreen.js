@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { firestore } from '../firebase'; // Assuming you're using firestore directly for fetching data
+import { firestore, auth } from '../firebase'; // Assuming you're using firestore directly for fetching data
 import CustomNavbar from '../components/CustomNavbar';
 
 const LeaderboardScreen = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const currentUserId = auth.currentUser?.uid;
 
   useEffect(() => {
     fetchLeaderboardData();
@@ -31,7 +32,7 @@ const LeaderboardScreen = () => {
   };
 
   const renderItem = ({ item, index }) => (
-    <View style={styles.item}>
+    <View style={[styles.item, item.id === currentUserId && styles.highlightedItem]}>
       <Text style={styles.rank}>{index + 1}</Text>
       <Text style={styles.username}>{item.username}</Text>
       <Text style={styles.level}>Level {item.level}</Text>
@@ -59,42 +60,51 @@ const LeaderboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff', // Adjust background color as needed
+    backgroundColor: '#f9f9f9', // Light background color for better contrast
+    paddingTop: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 20,
     marginBottom: 10,
   },
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 15,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    backgroundColor: '#fff',
+    marginVertical: 5,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+  highlightedItem: {
+    backgroundColor: '#dff0d8', // Highlight color for current user
   },
   rank: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
   username: {
     flex: 1,
     marginLeft: 10,
-    fontSize: 16,
+    fontSize: 18,
   },
   level: {
     fontWeight: 'bold',
     marginLeft: 10,
-    fontSize: 16,
+    fontSize: 18,
   },
   xp: {
     fontWeight: 'bold',
     marginLeft: 10,
-    fontSize: 16,
+    fontSize: 18,
   },
 });
 
