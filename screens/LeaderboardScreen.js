@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaView, View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { firestore, auth } from '../firebase'; // Assuming you're using firestore directly for fetching data
 import CustomNavbar from '../components/CustomNavbar';
 
@@ -50,7 +50,7 @@ const LeaderboardScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Leaderboard</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
@@ -62,7 +62,7 @@ const LeaderboardScreen = () => {
         />
       )}
       <CustomNavbar />
-    </View>
+    </SafeAreaView>
   );
 };
 
