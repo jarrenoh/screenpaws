@@ -200,12 +200,16 @@ const FriendsScreen = () => {
   const renderReceivedRequestItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text>{item.username}</Text>
-      <Button
-        title="Accept"
-        onPress={() => handleAcceptRequest(item.userId)}
-      />
+      <View style={styles.acceptButton}>
+        <Button
+          title="Accept"
+          color="green"
+          onPress={() => handleAcceptRequest(item.userId)}
+        />
+      </View>
       <Button
         title="Reject"
+        color="red"
         onPress={() => handleRejectRequest(item.userId)}
       />
     </View>
@@ -329,6 +333,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
     width: '100%',
+  },
+  acceptButton: {
+    marginRight: -150,
   },
   friendItem: {
     padding: 15,
