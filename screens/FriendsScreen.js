@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, TextInput, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, FlatList, ActivityIndicator, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { firebase, firestore, auth } from '../firebase';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest } from '../components/friendFunctions';
 import CustomNavbar from '../components/CustomNavbar';
@@ -63,6 +63,40 @@ const FriendsScreen = () => {
     fetchFriendsAndRequests();
   }, [currentUserId]);
 
+  const handleRejectRequest = async (fromUserId) => {
+    if (!fromUserId) {
+      console.error('Error rejecting friend request: fromUserId is undefined');
+      return;
+    }
+  
+    try {
+      const success = await rejectFriendRequest(currentUserId, fromUserId);
+      if (success) {
+        // Remove the rejected request from the local state
+        setReceivedRequests(prevRequests => prevRequests.filter(request => request.userId !== fromUserId));
+        
+        // Fetch the updated list of received requests
+        const updatedUserDoc = await firestore.collection('users').doc(currentUserId).get();
+        const updatedReceivedRequests = updatedUserDoc.data().friendRequests || [];
+        
+        // Map the received requests to include usernames
+        const updatedReceivedRequestsData = await Promise.all(updatedReceivedRequests.map(async (userId) => {
+          const userSnapshot = await firestore.collection('users').doc(userId).get();
+          return { userId, username: userSnapshot.data().username };
+        }));
+        
+        // Update the state with the updated received requests list
+        setReceivedRequests(updatedReceivedRequestsData);
+  
+        Alert.alert('Success', 'Friend request rejected!');
+      }
+    } catch (error) {
+      console.error('Error rejecting friend request:', error.message);
+      Alert.alert('Error', 'Failed to reject friend request. Please try again later.');
+    }
+  };
+  
+
   const handleAcceptRequest = async (fromUserId) => {
     if (!fromUserId) {
       console.error('Error accepting friend request: fromUserId is undefined');
@@ -70,63 +104,24 @@ const FriendsScreen = () => {
     }
 
     try {
-      await acceptFriendRequest(currentUserId, fromUserId);
+      const success = await acceptFriendRequest(currentUserId, fromUserId);
+      if (success) {
+        // Find the username of the accepted friend request
+        const acceptedRequest = receivedRequests.find(user => user.userId === fromUserId);
 
-      // Refresh the lists after accepting a request
-      const userRef = firestore.collection('users').doc(currentUserId);
-      const userDoc = await userRef.get();
+        // Update friends and received requests state
+        setFriends(prevFriends => [
+          ...prevFriends, 
+          { userId: fromUserId, username: acceptedRequest ? acceptedRequest.username : 'Unknown' }
+        ]);
+        setReceivedRequests(prevRequests => prevRequests.filter(request => request.userId !== fromUserId));
 
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-
-        const friendsData = userData.friends || [];
-        const friendPromises = friendsData.map(async (userId) => {
-          const userSnapshot = await firestore.collection('users').doc(userId).get();
-          return { userId, username: userSnapshot.data().username };
-        });
-        const resolvedFriends = await Promise.all(friendPromises);
-        setFriends(resolvedFriends);
-
-        const receivedRequestsData = userData.friendRequests || [];
-        const receivedRequestsPromises = receivedRequestsData.map(async (userId) => {
-          const userSnapshot = await firestore.collection('users').doc(userId).get();
-          return { userId, username: userSnapshot.data().username };
-        });
-        const resolvedReceivedRequests = await Promise.all(receivedRequestsPromises);
-        setReceivedRequests(resolvedReceivedRequests);
-
-        const sentRequestsData = userData.sentRequests || [];
-        const sentRequestsPromises = sentRequestsData.map(async (userId) => {
-          const userSnapshot = await firestore.collection('users').doc(userId).get();
-          return { userId, username: userSnapshot.data().username };
-        });
-        const resolvedSentRequests = await Promise.all(sentRequestsPromises);
-        setSentRequests(resolvedSentRequests);
+        Alert.alert('Success', 'Friend request accepted!');
       }
     } catch (error) {
       console.error('Error accepting friend request:', error.message);
+      Alert.alert('Error', 'Failed to accept friend request. Please try again later.');
     }
-  };
-
-  const handleSearch = async () => {
-    if (!searchQuery) return;
-    setLoadingSearch(true);
-
-    const usersRef = firestore.collection('users');
-    const querySnapshot = await usersRef
-      .where('username', '>=', searchQuery)
-      .where('username', '<=', searchQuery + '\uf8ff')
-      .get();
-
-    const results = [];
-    querySnapshot.forEach(doc => {
-      if (doc.id !== currentUserId) {
-        results.push({ id: doc.id, ...doc.data() });
-      }
-    });
-
-    setSearchResults(results);
-    setLoadingSearch(false);
   };
 
   const handleSendRequest = async (targetUserId) => {
@@ -158,11 +153,19 @@ const FriendsScreen = () => {
 
   const handleRemoveFriend = async (friendId) => {
     try {
-      // Remove friend from Firestore
-      const userRef = firestore.collection('users').doc(currentUserId);
-      await userRef.update({
-        friends: firebase.firestore.FieldValue.arrayRemove(friendId)
+      const batch = firestore.batch();
+      const currentUserRef = firestore.collection('users').doc(currentUserId);
+      const friendUserRef = firestore.collection('users').doc(friendId);
+
+      batch.update(currentUserRef, {
+        friends: firebase.firestore.FieldValue.arrayRemove(friendId),
       });
+
+      batch.update(friendUserRef, {
+        friends: firebase.firestore.FieldValue.arrayRemove(currentUserId),
+      });
+
+      await batch.commit();
 
       // Update local state
       setFriends(prevFriends => prevFriends.filter(friend => friend.userId !== friendId));
@@ -173,13 +176,42 @@ const FriendsScreen = () => {
     }
   };
 
+  const handleSearch = async () => {
+    if (!searchQuery) return;
+    setLoadingSearch(true);
+
+    const usersRef = firestore.collection('users');
+    const querySnapshot = await usersRef
+      .where('username', '>=', searchQuery)
+      .where('username', '<=', searchQuery + '\uf8ff')
+      .get();
+
+    const results = [];
+    querySnapshot.forEach(doc => {
+      if (doc.id !== currentUserId) {
+        results.push({ id: doc.id, ...doc.data() });
+      }
+    });
+
+    setSearchResults(results);
+    setLoadingSearch(false);
+  };
+
   const renderReceivedRequestItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text>{item.username}</Text>
-      <Button
-        title="Accept"
+      <TouchableOpacity 
+        style={styles.roundedButton1} 
         onPress={() => handleAcceptRequest(item.userId)}
-      />
+      >
+        <Text style={styles.buttonText}>Accept</Text>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.roundedButton2} 
+        onPress={() => handleRejectRequest(item.userId)}
+      >
+        <Text style={styles.buttonText}>Reject</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -192,20 +224,24 @@ const FriendsScreen = () => {
   const renderFriendItem = ({ item }) => (
     <View style={styles.friendItem}>
       <Text>{item.username}</Text>
-      <Button
-        title="Remove"
+      <TouchableOpacity 
+        style={styles.roundedButton2} 
         onPress={() => handleRemoveFriend(item.userId)}
-      />
+      >
+        <Text style={styles.buttonText}>Remove</Text>
+      </TouchableOpacity>
     </View>
   );
 
   const renderSearchResultItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text>{item.username}</Text>
-      <Button
-        title="Send Request"
+      <TouchableOpacity 
+        style={styles.roundedButton3} 
         onPress={() => handleSendRequest(item.id)}
-      />
+      >
+        <Text style={styles.buttonText}>Send Request</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -255,7 +291,12 @@ const FriendsScreen = () => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <Button title="Search" onPress={handleSearch} />
+        <TouchableOpacity 
+        style={styles.roundedButton3} 
+        onPress={handleSearch}
+        >
+        <Text style={styles.buttonText}>Search</Text>
+        </TouchableOpacity>
         {loadingSearch ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
@@ -312,6 +353,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
     width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   input: {
     height: 40,
@@ -339,12 +383,29 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: '#3949ab',
   },
-  button: {
-    marginTop: 10,
-    backgroundColor: '#3949ab',
-    padding: 10,
-    borderRadius: 8,
+  roundedButton1: {
+    justifyContent: 'center',
     alignItems: 'center',
+    padding: 10,
+    borderRadius: 20, // This makes the button rounded
+    backgroundColor: 'green', // Change this to your desired button color
+    marginRight: -150, // Adjust this value as needed
+  },
+  roundedButton2: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 20, // This makes the button rounded
+    backgroundColor: 'red', // Change this to your desired button color
+    marginRight: 5, // Adjust this value as needed
+  },
+  roundedButton3: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 20, // This makes the button rounded
+    backgroundColor: '#007BFF', // Change this to your desired button color
+    marginRight: 5, // Adjust this value as needed
   },
   buttonText: {
     color: '#fff',

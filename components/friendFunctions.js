@@ -23,35 +23,54 @@ export const sendFriendRequest = async (currentUserId, targetUserId) => {
   }
 };
 
-
-// Accept Friend Request
 export const acceptFriendRequest = async (currentUserId, fromUserId) => {
-  if (!currentUserId || !fromUserId) {
-    throw new Error('User IDs must be provided');
+  try {
+    const currentUserRef = firestore.collection('users').doc(currentUserId);
+    const fromUserRef = firestore.collection('users').doc(fromUserId);
+
+    await firestore.runTransaction(async (transaction) => {
+      const currentUserDoc = await transaction.get(currentUserRef);
+      const fromUserDoc = await transaction.get(fromUserRef);
+
+      if (!currentUserDoc.exists || !fromUserDoc.exists) {
+        throw new Error('User does not exist');
+      }
+
+      transaction.update(currentUserRef, {
+        friends: firebase.firestore.FieldValue.arrayUnion(fromUserId),
+        friendRequests: firebase.firestore.FieldValue.arrayRemove(fromUserId),
+      });
+
+      transaction.update(fromUserRef, {
+        friends: firebase.firestore.FieldValue.arrayUnion(currentUserId),
+        sentRequests: firebase.firestore.FieldValue.arrayRemove(currentUserId),
+      });
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Error accepting friend request:', error);
+    return false;
   }
-
-  const userRef = firestore.collection('users').doc(currentUserId);
-  const fromUserRef = firestore.collection('users').doc(fromUserId);
-
-  const batch = firestore.batch();
-
-  batch.update(userRef, {
-    friends: firebase.firestore.FieldValue.arrayUnion(fromUserId),
-    friendRequests: firebase.firestore.FieldValue.arrayRemove(fromUserId),
-  });
-
-  batch.update(fromUserRef, {
-    friends: firebase.firestore.FieldValue.arrayUnion(currentUserId),
-  });
-
-  await batch.commit();
 };
 
-// Reject Friend Request
-export const rejectFriendRequest = async (currentUserId, targetUserId) => {
-  const currentUserRef = firestore().collection('users').doc(currentUserId);
+// Add similar function for rejecting a friend request if necessary
+export const rejectFriendRequest = async (currentUserId, fromUserId) => {
+  try {
+    const currentUserRef = firestore.collection('users').doc(currentUserId);
+    const fromUserRef = firestore.collection('users').doc(fromUserId);
 
-  await currentUserRef.update({
-    friendRequests: firebase.firestore.FieldValue.arrayRemove(targetUserId),
-  });
+    await currentUserRef.update({
+      friendRequests: firebase.firestore.FieldValue.arrayRemove(fromUserId),
+    });
+
+    await fromUserRef.update({
+      sentRequests: firebase.firestore.FieldValue.arrayRemove(currentUserId),
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Error rejecting friend request:', error);
+    return false;
+  }
 };
