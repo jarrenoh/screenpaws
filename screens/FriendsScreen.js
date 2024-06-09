@@ -292,7 +292,7 @@ const FriendsScreen = () => {
           onChangeText={setSearchQuery}
         />
         <TouchableOpacity 
-        style={styles.roundedButton} 
+        style={styles.roundedButton3} 
         onPress={handleSearch}
         >
         <Text style={styles.buttonText}>Search</Text>
