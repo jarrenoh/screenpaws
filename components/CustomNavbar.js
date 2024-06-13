@@ -5,6 +5,7 @@ import home from '../assets/home.png';
 import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
 import friends from '../assets/friends.png';
 import leaderboard from '../assets/leaderboard.png';
+import shop from '../assets/shop.png';
 
 const CustomNavbar = () => {
   const navigation = useNavigation();
@@ -17,12 +18,16 @@ const CustomNavbar = () => {
       <TouchableOpacity onPress={() => navigation.navigate('Pet')} style={styles.navItem}>
         <Image source={pawLogo} style={styles.navIcon} />
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Shop')} style={styles.navItem}>
+        <Image source={shop} style={styles.navIcon} />
+      </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Friends')} style={styles.navItem}>
         <Image source={friends} style={styles.navIcon} />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Leaderboard')} style={styles.navItem}>
         <Image source={leaderboard} style={styles.navIcon} />
       </TouchableOpacity>
+
     </View>
   );
 };

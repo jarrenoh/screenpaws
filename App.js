@@ -8,6 +8,8 @@ import PetScreen from './screens/PetScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import FriendsScreen from './screens/FriendsScreen';
 import LeaderboardScreen from './screens/LeaderboardScreen';
+import ShopScreen from './screens/ShopScreen';
+import AchievementScreen from './screens/AchievementScreen';
 
 export default function App() {
   return (
@@ -19,6 +21,8 @@ export default function App() {
         <Stack.Screen options= {{headerShown: true}} name="Register" component={RegisterScreen} />
         <Stack.Screen options= {{headerShown: false}} name="Friends" component={FriendsScreen} />
         <Stack.Screen options= {{headerShown: false}} name="Leaderboard" component={LeaderboardScreen} />
+        <Stack.Screen options= {{headerShown: false}} name="Shop" component={ShopScreen} />
+        <Stack.Screen options= {{headerShown: true}} name="Achievements" component={AchievementScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
