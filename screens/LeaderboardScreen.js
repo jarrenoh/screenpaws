@@ -51,7 +51,7 @@ const LeaderboardScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Leaderboard</Text>
+      <Text style={styles.title}>Global Leaderboard</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (

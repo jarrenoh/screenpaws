@@ -22,7 +22,7 @@ export default function App() {
         <Stack.Screen options= {{headerShown: false}} name="Friends" component={FriendsScreen} />
         <Stack.Screen options= {{headerShown: false}} name="Leaderboard" component={LeaderboardScreen} />
         <Stack.Screen options= {{headerShown: false}} name="Shop" component={ShopScreen} />
-        <Stack.Screen options= {{headerShown: true}} name="Achievements" component={AchievementScreen} />
+        <Stack.Screen options= {{headerShown: false}} name="Achievements" component={AchievementScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

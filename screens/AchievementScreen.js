@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, FlatList, SafeAreaView } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 
@@ -30,7 +30,7 @@ const AchievementScreen = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.header}>Achievements</Text>
       <FlatList
         data={achievements}
@@ -47,7 +47,7 @@ const AchievementScreen = () => {
       <View style={styles.navbarContainer}>
         <CustomNavbar />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

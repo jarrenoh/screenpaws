@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View, Image, AppState } from 'react-native';
 import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
-import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
+
 import CustomNavbar from '../components/CustomNavbar';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Slider from '@react-native-community/slider';
@@ -124,19 +124,16 @@ const HomeScreen = () => {
   }, [countdownTime, timerActive]);
 
   const formatTime = (timeInSeconds) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  };
-
-  const getNameFromEmail = (email) => {
-    return email ? email.split('@')[0] : '';
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
   };
 
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Image source={pawLogo} style={[styles.image, styles.imageMargin]} />
+
         <Text>Welcome {auth.currentUser?.displayName}!</Text>
         <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
         
