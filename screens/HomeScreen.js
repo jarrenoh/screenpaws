@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View, Image, AppState } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View, AppState } from 'react-native';
 import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 
@@ -134,10 +134,8 @@ const HomeScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-
-        <Text>Welcome {auth.currentUser?.displayName}!</Text>
+        <Text style={styles.welcomeText}>Welcome {auth.currentUser?.displayName}!</Text>
         <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
-        
 
         <AnimatedCircularProgress
           size={200}
@@ -189,6 +187,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  welcomeText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
   },
   button: {
     backgroundColor: 'blue',
