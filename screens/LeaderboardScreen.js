@@ -1,16 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { firestore, auth } from '../firebase'; // Assuming you're using firestore directly for fetching data
+import { SafeAreaView, View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { firestore, auth } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 
 const LeaderboardScreen = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
+  const [friendsLeaderboardData, setFriendsLeaderboardData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const currentUserId = auth.currentUser?.uid; // Replace this with the actual current user ID
+  const [isGlobal, setIsGlobal] = useState(true);
+  const currentUserId = auth.currentUser?.uid;
 
   useEffect(() => {
-    fetchLeaderboardData();
-  }, []);
+    if (currentUserId) {
+      fetchLeaderboardData();
+    } else {
+      console.error('No current user ID');
+    }
+  }, [currentUserId]);
+
+  useEffect(() => {
+    if (currentUserId) {
+      const unsubscribe = firestore.collection('users').doc(currentUserId).onSnapshot((doc) => {
+        if (doc.exists) {
+          const userData = doc.data();
+          if (userData?.friends) {
+            fetchFriendsLeaderboardData(leaderboardData, userData.friends);
+          }
+        }
+      });
+
+      return () => unsubscribe();
+    }
+  }, [leaderboardData, currentUserId]);
 
   const fetchLeaderboardData = async () => {
     try {
@@ -24,11 +45,50 @@ const LeaderboardScreen = () => {
         return 0;
       });
       setLeaderboardData(data);
+      if (currentUserId) {
+        const userDoc = await firestore.collection('users').doc(currentUserId).get();
+        const userData = userDoc.data();
+        if (userData?.friends) {
+          fetchFriendsLeaderboardData(data, userData.friends);
+        }
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching leaderboard data:', error.message);
       setLoading(false);
     }
+  };
+
+  const fetchFriendsLeaderboardData = async (globalData, friendsList) => {
+    try {
+      if (!currentUserId) {
+        console.error('No current user ID');
+        return;
+      }
+      friendsList = [...friendsList, currentUserId]; // Add current user to the friends list
+      console.log('Friends List:', friendsList); // Debug log to check friends list
+
+      if (friendsList.length > 0) {
+        const filteredData = globalData.filter(user => friendsList.includes(user.id));
+        filteredData.sort((a, b) => {
+          if (a.xp === b.xp) {
+            return a.username.localeCompare(b.username);
+          }
+          return 0;
+        });
+        console.log('Filtered Data:', filteredData); // Debug log to check filtered data
+        setFriendsLeaderboardData(filteredData);
+      } else {
+        setFriendsLeaderboardData([]);
+        console.log('Friends list is empty or not available.');
+      }
+    } catch (error) {
+      console.error('Error fetching friends leaderboard data:', error.message);
+    }
+  };
+
+  const toggleLeaderboard = () => {
+    setIsGlobal(!isGlobal);
   };
 
   const renderItem = ({ item, index }) => (
@@ -51,12 +111,20 @@ const LeaderboardScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Global Leaderboard</Text>
+      <Text style={styles.title}>{isGlobal ? 'Global Leaderboard' : 'Friends Leaderboard'}</Text>
+      <View style={styles.toggleContainer}>
+        <TouchableOpacity onPress={toggleLeaderboard} style={[styles.toggleButton, isGlobal && styles.activeToggleButton]}>
+          <Text style={styles.toggleButtonText}>Global</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleLeaderboard} style={[styles.toggleButton, !isGlobal && styles.activeToggleButton]}>
+          <Text style={styles.toggleButtonText}>Friends</Text>
+        </TouchableOpacity>
+      </View>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <FlatList
-          data={leaderboardData}
+          data={isGlobal ? leaderboardData : friendsLeaderboardData}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />
@@ -69,7 +137,7 @@ const LeaderboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9', // Light background color for better contrast
+    backgroundColor: '#f9f9f9',
     paddingTop: 20,
   },
   title: {
@@ -77,6 +145,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  toggleButton: {
+    padding: 10,
+    margin: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#000',
+    backgroundColor: '#fff',
+  },
+  activeToggleButton: {
+    backgroundColor: '#007AFF',
+  },
+  toggleButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
   },
   item: {
     flexDirection: 'row',
@@ -94,7 +182,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   highlightedItem: {
-    backgroundColor: '#7DF9FF', // Highlight color for current user
+    backgroundColor: '#7DF9FF',
   },
   userInfo: {
     flexDirection: 'row',
