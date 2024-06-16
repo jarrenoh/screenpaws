@@ -44,22 +44,38 @@ const AchievementScreen = () => {
       const user = auth.currentUser;
       if (!user) return;
 
-      const achievementsSnapshot = await firestore.collection('achievements')
-        .where('name', '==', 'First Login')
-        .get();
+      const userDoc = await firestore.collection('users').doc(user.uid).get();
+      const userData = userDoc.data();
+      const userLevel = userData.level || 1;
 
-      if (achievementsSnapshot.empty) {
-        const newAchievementId = await addAchievement('First Login', 'Awarded for logging in for the first time', 10);
-        if (newAchievementId) {
-          await addUserAchievement(newAchievementId);
-          setUserAchievements(prev => [...prev, newAchievementId]); // Update state directly to reflect change
+      const addAchievementIfNotExist = async (achievementName, achievementDescription, thresholdLevel) => {
+        const achievementsSnapshot = await firestore.collection('achievements')
+          .where('name', '==', achievementName)
+          .get();
+
+        if (achievementsSnapshot.empty) {
+          const newAchievementId = await addAchievement(achievementName, achievementDescription, 10);
+          if (newAchievementId) {
+            await addUserAchievement(newAchievementId);
+            setUserAchievements(prev => [...prev, newAchievementId]); // Update state directly to reflect change
+          }
+        } else {
+          const achievementId = achievementsSnapshot.docs[0].id;
+          if (achievementId && !userAchievements.includes(achievementId)) {
+            await addUserAchievement(achievementId);
+            setUserAchievements(prev => [...prev, achievementId]); // Update state directly to reflect change
+          }
         }
-      } else {
-        const firstLoginAchievementId = achievementsSnapshot.docs[0].id;
-        if (firstLoginAchievementId && !userAchievements.includes(firstLoginAchievementId)) {
-          await addUserAchievement(firstLoginAchievementId);
-          setUserAchievements(prev => [...prev, firstLoginAchievementId]); // Update state directly to reflect change
-        }
+      };
+
+      if (userLevel >= 1) {
+        await addAchievementIfNotExist('First Login', 'Awarded for logging in for the first time', 1);
+      }
+      if (userLevel >= 5) {
+        await addAchievementIfNotExist('Level 5 Achiever', 'Awarded for reaching level 5', 5);
+      }
+      if (userLevel >= 15) {
+        await addAchievementIfNotExist('Level 15 Achiever', 'Awarded for reaching level 15', 15);
       }
 
       setHasCheckedAchievements(true);
