@@ -65,8 +65,7 @@ const LeaderboardScreen = () => {
         console.error('No current user ID');
         return;
       }
-      friendsList = [...friendsList, currentUserId]; // Add current user to the friends list
-      console.log('Friends List:', friendsList); // Debug log to check friends list
+      friendsList = [...friendsList, currentUserId]; 
 
       if (friendsList.length > 0) {
         const filteredData = globalData.filter(user => friendsList.includes(user.id));
@@ -76,7 +75,6 @@ const LeaderboardScreen = () => {
           }
           return 0;
         });
-        console.log('Filtered Data:', filteredData); // Debug log to check filtered data
         setFriendsLeaderboardData(filteredData);
       } else {
         setFriendsLeaderboardData([]);

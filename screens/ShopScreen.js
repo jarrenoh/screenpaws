@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 
@@ -108,6 +108,6 @@ const styles = StyleSheet.create({
   navbarContainer: {
     position: 'absolute',
     bottom: 0,
-    width: '100%',
+    width: Dimensions.get('window').width,
   },
 });
