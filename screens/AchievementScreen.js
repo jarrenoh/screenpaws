@@ -8,15 +8,15 @@ import { addAchievement, addUserAchievement } from '../components/achFunctions';
 import WelcomeIcon from '../assets/welcome.png';
 import NumberFiveIcon from '../assets/number-five-icon.png';
 import Level15Icon from '../assets/15.png';
-import Level10Icon from '../assets/15.png'; // Example, you need to add these icons
-import Level20Icon from '../assets/15.png';
-import Level30Icon from '../assets/15.png';
-import Level40Icon from '../assets/15.png';
-import Level50Icon from '../assets/15.png';
-import Level75Icon from '../assets/15.png';
-import Level100Icon from '../assets/15.png';
-import Level150Icon from '../assets/15.png';
-import Level200Icon from '../assets/15.png';
+import Level10Icon from '../assets/number-ten-icon.png'; // Example, you need to add these icons
+import Level20Icon from '../assets/number-20_9543187.png';
+import Level30Icon from '../assets/30-512.png';
+import Level40Icon from '../assets/40-percent-icon.png';
+import Level50Icon from '../assets/50.png';
+import Level75Icon from '../assets/75.png';
+import Level100Icon from '../assets/100-percent-icon.png';
+import Level150Icon from '../assets/150_13928012.png';
+import Level200Icon from '../assets/200.png';
 
 const AchievementScreen = () => {
   const [achievements, setAchievements] = useState([]);
