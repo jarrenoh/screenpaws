@@ -104,6 +104,13 @@ const AchievementScreen = () => {
     }
   };
 
+  const sortAchievements = (a, b) => {
+    const order = ['First Login', 'Level 5 Achiever', 'Level 15 Achiever'];
+    const indexA = order.indexOf(a.name);
+    const indexB = order.indexOf(b.name);
+    return indexA - indexB;
+  };
+
   const combinedAchievements = achievements
     .map(achievement => ({
       ...achievement,
@@ -112,7 +119,8 @@ const AchievementScreen = () => {
     }))
     .filter((achievement, index, self) =>
       index === self.findIndex((a) => a.name === achievement.name)
-    );
+    )
+    .sort(sortAchievements); // Sort achievements here
 
   return (
     <SafeAreaView style={styles.container}>
