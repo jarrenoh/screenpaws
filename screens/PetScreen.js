@@ -38,7 +38,8 @@ const PetScreen = () => {
           setXp(userXp);
           const userLevel = userData.level || Math.floor(userXp / 10) + 1; // 10 XP per level
           setLevel(userLevel);
-
+          const userEquippedItem = userData.equippedItem || null;
+          setEquippedItem(userEquippedItem);
           const userCoins = userData.coins || Math.floor(userElapsedTime / 120); // 1 coin per 2 minutes
           setCoins(userCoins);
 

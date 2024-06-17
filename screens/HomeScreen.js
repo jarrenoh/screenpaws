@@ -67,9 +67,15 @@ const HomeScreen = () => {
     if (user) {
       const newXp = Math.floor(newElapsedTime / 60); // 1 XP per minute
       const newLevel = Math.floor(newXp / 10) + 1; // 10 XP per level
+      const newCoins = Math.floor(newElapsedTime / 120); // 1 coin per 2 minutes
+
       try {
+        const userDoc = await firestore.collection('users').doc(user.uid).get();
+        const userData = userDoc.data();
+        const currentCoins = userData.coins || 0;
+
         await firestore.collection('users').doc(user.uid).set(
-          { elapsedTime: newElapsedTime, xp: newXp, level: newLevel },
+          { elapsedTime: newElapsedTime, xp: newXp, level: newLevel, coins: currentCoins + newCoins },
           { merge: true }
         );
       } catch (error) {
