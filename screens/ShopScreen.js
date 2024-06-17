@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
+import { Image, StyleSheet, View, Text, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
+import zenbg from '../assets/zenbg.webp';
+
+const images = {
+    zenbg: zenbg,
+    // add more images here
+  };
 
 const ShopScreen = () => {
   const [coins, setCoins] = useState(0);
@@ -65,6 +71,11 @@ const ShopScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
+            <Image 
+              source={images[item.imageName]} 
+              style={styles.itemImage} 
+              onError={(error) => console.log('Error loading image', error)}
+              />
             <Text style={styles.itemText}>{item.name}</Text>
             <Text style={styles.itemText}>Price: {item.price} coins</Text>
             <TouchableOpacity
@@ -129,5 +140,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: Dimensions.get('window').width,
+  },
+  itemImage: {
+    width: 50,
+    height: 50,
+    marginRight: 16,
   },
 });

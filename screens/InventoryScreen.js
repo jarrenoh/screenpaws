@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, SafeAreaView, Dimensions, TouchableOpacity, Image } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
+import zenbg from '../assets/zenbg.webp';
+
+const images = {
+    zenbg: zenbg,
+    // add more images here
+  };
 
 const InventoryScreen = () => {
   const [userItems, setUserItems] = useState([]);
@@ -42,8 +48,12 @@ const InventoryScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
             <View style={styles.itemContainer}>
-                <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
-                <Text style={styles.itemText}>{item.name}</Text>
+                <Image 
+                    source={images[item.imageName]} 
+                    style={styles.itemImage} 
+                    onError={(error) => console.log('Error loading image', error)}
+                    />
+                <Text style={styles.itemText}>{item.name}{" "}</Text>
                 <Text style={styles.itemDescription}>{item.description}</Text>
                 <TouchableOpacity style={styles.equipButton} onPress={() => handleEquipItem(item)}>
                     <Text style={styles.equipButtonText}>
