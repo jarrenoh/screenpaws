@@ -20,6 +20,7 @@ const PetScreen = () => {
   const [level, setLevel] = useState(1);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [equippedItem, setEquippedItem] = useState(null);
+  const [coins, setCoins] = useState(0);
   
   const navigation = useNavigation();
 
@@ -27,7 +28,8 @@ const PetScreen = () => {
     const fetchUserData = async () => {
       const user = auth.currentUser;
       if (user) {
-        const userDoc = await firestore.collection('users').doc(user.uid).get();
+        const userDocRef = firestore.collection('users').doc(user.uid);
+        const userDoc = await userDocRef.get();
         if (userDoc.exists) {
           const userData = userDoc.data();
           const userElapsedTime = userData.elapsedTime || 0;
@@ -36,7 +38,14 @@ const PetScreen = () => {
           setXp(userXp);
           const userLevel = userData.level || Math.floor(userXp / 10) + 1; // 10 XP per level
           setLevel(userLevel);
-          setEquippedItem(userData.equippedItem || null);
+
+          const userCoins = userData.coins || Math.floor(userElapsedTime / 120); // 1 coin per 2 minutes
+          setCoins(userCoins);
+
+          // Update coins in Firestore
+          await userDocRef.update({
+            coins: userCoins,
+          });
         }
       }
     };
