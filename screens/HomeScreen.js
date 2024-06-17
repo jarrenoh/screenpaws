@@ -145,7 +145,6 @@ const HomeScreen = () => {
       <View style={styles.container}>
         <Text style={styles.welcomeText}>Welcome {auth.currentUser?.displayName}!</Text>
         <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
-
         <AnimatedCircularProgress
           size={200}
           width={10}
