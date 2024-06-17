@@ -20,7 +20,7 @@ const PetScreen = () => {
   const [level, setLevel] = useState(1);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [equippedItem, setEquippedItem] = useState(null);
-  const [coins, setCoins] = useState(0);
+
   
   const navigation = useNavigation();
 
@@ -40,13 +40,6 @@ const PetScreen = () => {
           setLevel(userLevel);
           const userEquippedItem = userData.equippedItem || null;
           setEquippedItem(userEquippedItem);
-          const userCoins = userData.coins || Math.floor(userElapsedTime / 120); // 1 coin per 2 minutes
-          setCoins(userCoins);
-
-          // Update coins in Firestore
-          await userDocRef.update({
-            coins: userCoins,
-          });
         }
       }
     };

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View, AppState } from 'react-native';
 import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
-
 import CustomNavbar from '../components/CustomNavbar';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Slider from '@react-native-community/slider';
@@ -15,6 +14,7 @@ const HomeScreen = () => {
   const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const intervalRef = useRef(null);
+  const [coins, setCoins] = useState(0);
 
   useEffect(() => {
     const fetchElapsedTime = async () => {
@@ -65,17 +65,19 @@ const HomeScreen = () => {
   const updateElapsedTimeInFirestore = async (newElapsedTime) => {
     const user = auth.currentUser;
     if (user) {
-      const newXp = Math.floor(newElapsedTime / 60); // 1 XP per minute
-      const newLevel = Math.floor(newXp / 10) + 1; // 10 XP per level
-      const newCoins = Math.floor(newElapsedTime / 120); // 1 coin per 2 minutes
-
+      const lastElapsedTime = elapsedTime; // Save the last elapsed time
+      const elapsedTimeDiff = newElapsedTime - lastElapsedTime; // Calculate the difference
+      const gainedCoins = Math.floor(elapsedTimeDiff / 120); // 1 coin per 2 minutes
+  
+      console.log("Gained Coins:", gainedCoins); // Log the gained coins
+  
       try {
         const userDoc = await firestore.collection('users').doc(user.uid).get();
         const userData = userDoc.data();
         const currentCoins = userData.coins || 0;
-
+  
         await firestore.collection('users').doc(user.uid).set(
-          { elapsedTime: newElapsedTime, xp: newXp, level: newLevel, coins: currentCoins + newCoins },
+          { elapsedTime: newElapsedTime, coins: currentCoins + gainedCoins },
           { merge: true }
         );
       } catch (error) {
@@ -83,6 +85,7 @@ const HomeScreen = () => {
       }
     }
   };
+  
 
   const handleLogout = async () => {
     await updateElapsedTimeInFirestore(elapsedTime); // Save elapsed time before logout
@@ -123,7 +126,7 @@ const HomeScreen = () => {
         "Timer Finished",
         "Your countdown timer has reached zero!",
         [
-          { text: "OK", onPress: () => console.log("OK Pressed") }
+          { text: "OK"}
         ]
       );
     }
