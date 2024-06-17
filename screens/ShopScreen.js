@@ -6,7 +6,7 @@ import zenbg from '../assets/zenbg.webp';
 
 const images = {
     zenbg: zenbg,
-    // add more images here
+    // add more images here and import accordingly
   };
 
 const ShopScreen = () => {

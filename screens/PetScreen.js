@@ -8,6 +8,12 @@ import swoledoge from '../assets/swole.webp';
 import achievement from '../assets/achievement.png';
 import inventory from '../assets/bag.png';
 import { useNavigation } from '@react-navigation/native';
+import zenbg from '../assets/zenbg.webp';
+
+const images = {
+  zenbg: zenbg,
+  // add more images here
+};
 
 const PetScreen = () => {
   const [xp, setXp] = useState(0);
@@ -52,16 +58,8 @@ const PetScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerButtons}>
-        <TouchableOpacity onPress={() => navigation.navigate('Achievements')} style={styles.achievementButton}>
-          <Image source={achievement} style={styles.achievementIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Inventory')} style={styles.inventoryButton}>
-          <Image source={inventory} style={styles.inventoryIcon} />
-        </TouchableOpacity>
-      </View>
       <View style={styles.content}>
-        {equippedItem && <Image source={{ uri: equippedItem.imageUrl }} style={styles.backgroundImage} />}
+        {equippedItem && <Image source={images[equippedItem.imageName]} style={styles.backgroundImage} />}
         <Image source={level === 1 ? dog : level >= 5 ? swoledoge : placeholderImage} style={styles.image} />
         <Text style={styles.text}>
           {level === 1 ? 'Hungry Dog' : level >= 2 && level <= 5 ? 'Weak Doge' : 'Swole Doge'}
@@ -76,6 +74,14 @@ const PetScreen = () => {
       </View>
       <View style={styles.navbarContainer}>
         <CustomNavbar />
+      </View>
+      <View style={styles.headerButtons}>
+        <TouchableOpacity onPress={() => navigation.navigate('Achievements')} style={styles.achievementButton}>
+          <Image source={achievement} style={styles.achievementIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Inventory')} style={styles.inventoryButton}>
+          <Image source={inventory} style={styles.inventoryIcon} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -94,30 +100,30 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     width: '100%',
     padding: 16,
+    position: 'absolute',
+    top: 60,
+    right: 0,
+    zIndex: 1,
   },
   achievementButton: {
-    position: 'absolute',
-    top: 60,
-    right: 30,
-    width : 40,
-    height : 40,
+    marginRight: 16,
+    zIndex: 1,
   },
   achievementIcon: {
-    width: '100%',
-    height: '100%',
+    width: 40,
+    height: 40,
     resizeMode: 'contain',
+    zIndex: 1,
   },
   inventoryButton: {
-    position: 'absolute',
-    top: 60,
-    left: 30,
-    width : 40,
-    height : 40,
+    marginRight: 16,
+    zIndex: 1,
   },
   inventoryIcon: {
-    width: '100 %',
-    height: '100 %',
+    width: 40,
+    height: 40,
     resizeMode: 'contain',
+    zIndex: 1,
   },
   content: {
     flex: 1,
@@ -126,9 +132,9 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     position: 'absolute',
-    width: 200,
-    height: 200,
-    resizeMode: 'contain',
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
     zIndex: 0,
   },
   image: {
