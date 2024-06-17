@@ -6,12 +6,15 @@ import dog from '../assets/dog.png';
 import placeholderImage from '../assets/dog.jpeg';
 import swoledoge from '../assets/swole.webp';
 import achievement from '../assets/achievement.png';
+import bag from '../assets/bag.png';
 import { useNavigation } from '@react-navigation/native';
+
 
 const PetScreen = () => {
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [coins, setCoins] = useState(0);
 
   const navigation = useNavigation();
 
@@ -19,7 +22,8 @@ const PetScreen = () => {
     const fetchUserData = async () => {
       const user = auth.currentUser;
       if (user) {
-        const userDoc = await firestore.collection('users').doc(user.uid).get();
+        const userDocRef = firestore.collection('users').doc(user.uid);
+        const userDoc = await userDocRef.get();
         if (userDoc.exists) {
           const userData = userDoc.data();
           const userElapsedTime = userData.elapsedTime || 0;
@@ -28,6 +32,13 @@ const PetScreen = () => {
           setXp(userXp);
           const userLevel = userData.level || Math.floor(userXp / 10) + 1; // 10 XP per level
           setLevel(userLevel);
+
+          const userCoins = userData.coins || Math.floor(userElapsedTime / 120); // 1 coin per 2 minutes
+          setCoins(userCoins);
+
+          await userDocRef.update({
+            coins: userCoins,
+          });
         }
       }
     };
@@ -48,6 +59,9 @@ const PetScreen = () => {
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.navigate('Achievements')} style={styles.achievementButton}>
         <Image source={achievement} style={styles.achievementIcon} />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Inventory')} style={styles.inventoryButton}>
+        <Image source={bag} style={styles.inventoryIcon} />
       </TouchableOpacity>
       <View style={styles.content}>
         <Image source={level === 1 ? dog : level >= 5 ? swoledoge : placeholderImage} style={styles.image} />
@@ -130,5 +144,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
+  },
+  inventoryButton: {
+    position: 'absolute',
+    top: 60,
+    left: 30,
+    width: 40,
+    height: 50,
+  },
+  inventoryIcon: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
 });

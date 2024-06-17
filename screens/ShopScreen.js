@@ -32,16 +32,24 @@ const ShopScreen = () => {
   }, []);
 
   const handleBuyItem = async (item) => {
+    // Check if the item is already purchased
+    if (userItems.some(userItem => userItem.id === item.id)) {
+      alert('You have already purchased this item.');
+      return;
+    }
+
     if (coins >= item.price) {
       const newCoins = coins - item.price;
+      const updatedUserItems = [...userItems, item];
+
       setCoins(newCoins);
-      setUserItems([...userItems, item]);
+      setUserItems(updatedUserItems);
 
       const user = auth.currentUser;
       if (user) {
         await firestore.collection('users').doc(user.uid).update({
           coins: newCoins,
-          items: [...userItems, item]
+          items: updatedUserItems
         });
       }
     } else {
@@ -59,8 +67,17 @@ const ShopScreen = () => {
           <View style={styles.itemContainer}>
             <Text style={styles.itemText}>{item.name}</Text>
             <Text style={styles.itemText}>Price: {item.price} coins</Text>
-            <TouchableOpacity style={styles.buyButton} onPress={() => handleBuyItem(item)}>
-              <Text style={styles.buyButtonText}>Buy</Text>
+            <TouchableOpacity
+              style={[
+                styles.buyButton,
+                userItems.some(userItem => userItem.id === item.id) && styles.disabledButton
+              ]}
+              onPress={() => handleBuyItem(item)}
+              disabled={userItems.some(userItem => userItem.id === item.id)}
+            >
+              <Text style={styles.buyButtonText}>
+                {userItems.some(userItem => userItem.id === item.id) ? 'Bought' : 'Buy'}
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -100,6 +117,9 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: '#76c7c0',
     borderRadius: 4,
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
   },
   buyButtonText: {
     color: '#fff',
