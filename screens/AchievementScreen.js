@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, SafeAreaView, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, FlatList, SafeAreaView, Dimensions, Image } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 import { addAchievement, addUserAchievement } from '../components/achFunctions';
+
+// Importing the icons
+import WelcomeIcon from '../assets/welcome.png';
+import NumberFiveIcon from '../assets/number-five-icon.png';
+import Level15Icon from '../assets/15.png';
 
 const AchievementScreen = () => {
   const [achievements, setAchievements] = useState([]);
@@ -48,13 +53,13 @@ const AchievementScreen = () => {
       const userData = userDoc.data();
       const userLevel = userData.level || 1;
 
-      const addAchievementIfNotExist = async (achievementName, achievementDescription, thresholdLevel) => {
+      const addAchievementIfNotExist = async (achievementName, achievementDescription, thresholdLevel, icon) => {
         const achievementsSnapshot = await firestore.collection('achievements')
           .where('name', '==', achievementName)
           .get();
 
         if (achievementsSnapshot.empty) {
-          const newAchievementId = await addAchievement(achievementName, achievementDescription, 10);
+          const newAchievementId = await addAchievement(achievementName, achievementDescription, thresholdLevel);
           if (newAchievementId) {
             await addUserAchievement(newAchievementId);
             setUserAchievements(prev => [...prev, newAchievementId]); // Update state directly to reflect change
@@ -69,13 +74,13 @@ const AchievementScreen = () => {
       };
 
       if (userLevel >= 1) {
-        await addAchievementIfNotExist('First Login', 'Awarded for logging in for the first time', 1);
+        await addAchievementIfNotExist('First Login', 'Awarded for logging in for the first time', 1, WelcomeIcon);
       }
       if (userLevel >= 5) {
-        await addAchievementIfNotExist('Level 5 Achiever', 'Awarded for reaching level 5', 5);
+        await addAchievementIfNotExist('Level 5 Achiever', 'Awarded for reaching level 5', 5, NumberFiveIcon);
       }
       if (userLevel >= 15) {
-        await addAchievementIfNotExist('Level 15 Achiever', 'Awarded for reaching level 15', 15);
+        await addAchievementIfNotExist('Level 15 Achiever', 'Awarded for reaching level 15', 15, Level15Icon);
       }
 
       setHasCheckedAchievements(true);
@@ -86,9 +91,23 @@ const AchievementScreen = () => {
     }
   }, [isFetching, userAchievements, hasCheckedAchievements]);
 
+  const getAchievementIcon = (name) => {
+    switch (name) {
+      case 'First Login':
+        return WelcomeIcon;
+      case 'Level 5 Achiever':
+        return NumberFiveIcon;
+      case 'Level 15 Achiever':
+        return Level15Icon;
+      default:
+        return null; // Or some default icon
+    }
+  };
+
   const combinedAchievements = achievements
     .map(achievement => ({
       ...achievement,
+      icon: getAchievementIcon(achievement.name), // Assign the appropriate icon
       status: userAchievements.includes(achievement.id) ? 'Unlocked' : 'Locked'
     }))
     .filter((achievement, index, self) =>
@@ -103,6 +122,7 @@ const AchievementScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.achievementContainer}>
+            {item.icon && <Image source={item.icon} style={styles.achievementIcon} />}
             <Text style={styles.achievementText}>{item.name}</Text>
             <Text style={styles.achievementText}>{item.status}</Text>
           </View>
@@ -136,6 +156,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  achievementIcon: {
+    width: 40,
+    height: 40,
+    marginRight: 16,
   },
   achievementText: {
     fontSize: 18,
