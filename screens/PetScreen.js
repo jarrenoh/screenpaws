@@ -9,9 +9,13 @@ import achievement from '../assets/achievement.png';
 import inventory from '../assets/bag.png';
 import { useNavigation } from '@react-navigation/native';
 import zenbg from '../assets/zenbg.webp';
+import yellowaura from '../assets/yellowaura.png';
+import blueaura from '../assets/blueaura.png';
 
 const images = {
   zenbg: zenbg,
+  yellowaura: yellowaura,
+  blueaura: blueaura,
   // add more images here
 };
 

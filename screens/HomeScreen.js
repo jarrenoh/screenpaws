@@ -9,9 +9,8 @@ import Slider from '@react-native-community/slider';
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [countdownTime, setCountdownTime] = useState(0);
-  const [initialCountdownTime, setInitialCountdownTime] = useState(0); // New state to track the initial countdown time
+  const [initialCountdownTime, setInitialCountdownTime] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
-  const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const intervalRef = useRef(null);
   const [coins, setCoins] = useState(0);
@@ -34,8 +33,6 @@ const HomeScreen = () => {
   useEffect(() => {
     if (timerActive && countdownTime > 0) {
       intervalRef.current = setInterval(() => {
-        const currentTime = Date.now();
-        setStartTime(currentTime); // Reset the start time for the next interval
         setCountdownTime(prevTime => prevTime - 1);
       }, 1000);
     } else {
@@ -65,17 +62,17 @@ const HomeScreen = () => {
   const updateElapsedTimeInFirestore = async (newElapsedTime) => {
     const user = auth.currentUser;
     if (user) {
-      const lastElapsedTime = elapsedTime; // Save the last elapsed time
-      const elapsedTimeDiff = newElapsedTime - lastElapsedTime; // Calculate the difference
-      const gainedCoins = Math.floor(elapsedTimeDiff / 120); // 1 coin per 2 minutes
-  
-      console.log("Gained Coins:", gainedCoins); // Log the gained coins
-  
+      const lastElapsedTime = elapsedTime;
+      const elapsedTimeDiff = newElapsedTime - lastElapsedTime;
+      const gainedCoins = Math.floor(elapsedTimeDiff / 120);
+
+      console.log("Gained Coins:", gainedCoins);
+
       try {
         const userDoc = await firestore.collection('users').doc(user.uid).get();
         const userData = userDoc.data();
         const currentCoins = userData.coins || 0;
-  
+
         await firestore.collection('users').doc(user.uid).set(
           { elapsedTime: newElapsedTime, coins: currentCoins + gainedCoins },
           { merge: true }
@@ -85,10 +82,9 @@ const HomeScreen = () => {
       }
     }
   };
-  
 
   const handleLogout = async () => {
-    await updateElapsedTimeInFirestore(elapsedTime); // Save elapsed time before logout
+    await updateElapsedTimeInFirestore(elapsedTime);
     auth.signOut()
       .then(() => {
         console.log('Logged out');
@@ -103,20 +99,20 @@ const HomeScreen = () => {
       return;
     }
     if (!timerActive) {
-      setStartTime(Date.now());
+      setTimerActive(true);
+    } else {
+      setTimerActive(false);
     }
-    setTimerActive(prevState => !prevState);
   };
 
   const handleSetTime = (value) => {
     const timeInSeconds = value * 60;
     setCountdownTime(timeInSeconds);
-    setInitialCountdownTime(timeInSeconds); // Set the initial countdown time
+    setInitialCountdownTime(timeInSeconds);
   };
 
   useEffect(() => {
     if (countdownTime === 0 && timerActive) {
-      // Only update elapsed time if the timer was active and reached zero
       const newElapsedTime = elapsedTime + initialCountdownTime;
       updateElapsedTimeInFirestore(newElapsedTime);
       setElapsedTime(newElapsedTime);
@@ -126,7 +122,7 @@ const HomeScreen = () => {
         "Timer Finished",
         "Your countdown timer has reached zero!",
         [
-          { text: "OK"}
+          { text: "OK" }
         ]
       );
     }
@@ -136,7 +132,7 @@ const HomeScreen = () => {
     const hours = Math.floor(timeInSeconds / 3600);
     const minutes = Math.floor((timeInSeconds % 3600) / 60);
     const seconds = timeInSeconds % 60;
-    
+
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
@@ -216,12 +212,6 @@ const styles = StyleSheet.create({
   stopButton: {
     backgroundColor: 'red',
   },
-  resetButton: {
-    backgroundColor: 'gray',
-  },
-  setButton: {
-    backgroundColor: 'orange',
-  },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
@@ -231,14 +221,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
     fontWeight: 'bold',
-  },
-  image: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
-  },
-  imageMargin: {
-    marginBottom: 20,
   },
   slider: {
     width: '80%',

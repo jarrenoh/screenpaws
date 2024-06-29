@@ -3,9 +3,13 @@ import { Image, StyleSheet, View, Text, TouchableOpacity, FlatList, SafeAreaView
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 import zenbg from '../assets/zenbg.webp';
+import yellowaura from '../assets/yellowaura.png';
+import blueaura from '../assets/blueaura.png';
 
 const images = {
     zenbg: zenbg,
+    yellowaura: yellowaura,
+    blueaura: blueaura,
     // add more images here and import accordingly
   };
 
