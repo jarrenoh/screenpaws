@@ -21,7 +21,8 @@
     "react-native": "^0.74.2",
     "react-native-circular-progress": "^1.4.0",
     "react-native-screens": "^3.31.1",
-    "react-native-usage-stats": "^0.0.9"
+    "react-native-usage-stats": "^0.0.9",
+    "expo-updates": "~0.25.18"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

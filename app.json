@@ -12,16 +12,30 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.orbitalscreenpaws.screenpaws"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.orbitalscreenpaws.screenpaws"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "21ffe34c-40e6-482c-b05f-f40cb9f77223"
+      }
+    },
+    "owner": "orbital-screenpaws",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/21ffe34c-40e6-482c-b05f-f40cb9f77223"
     }
   }
 }
