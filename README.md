@@ -1,5 +1,15 @@
 # Screenpaws
 Installation
+(Mobile Devices)
 1. Download Expo Go on your mobile device
-2. Scan the QR Code below
-<img width="193" alt="Screenshot 2024-06-29 at 11 32 59 PM" src="https://github.com/jarrenoh/screenpaws/assets/134527317/ed44fc36-c2e9-47b5-b7d2-e52d39bd1447">
+2. Scan the QR Code below to try out Screenpaws!
+ 
+![expoqr](https://github.com/jarrenoh/screenpaws/assets/134527317/b32bae30-0d2e-4b1a-826b-4ab2f09e426b)
+
+(Windows/Mac)
+1. Ensure that you have all prior dependencies installed (Node.js, nvm, Expo)
+2. Ensure that you have either an Andriod or iOS emulator on your local machine.
+3. Clone the repostitory to your local machine
+`git clone https://github.com/jarrenoh/screenpaws.git`
+4. Open a new terminal window at the project directory
+5. Run `npx expo start` then open the project using the emulator you have on your local machine
