@@ -2,16 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, SafeAreaView, Dimensions, TouchableOpacity, Image } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
-import zenbg from '../assets/zenbg.webp';
-import yellowaura from '../assets/yellowaura.png';
-import blueaura from '../assets/blueaura.png';
-
-const images = {
-    zenbg: zenbg,
-    yellowaura: yellowaura,
-    blueaura: blueaura,
-    // add more images here
-  };
+import images from '../components/images';
 
 const InventoryScreen = () => {
   const [userItems, setUserItems] = useState([]);

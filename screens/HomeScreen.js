@@ -13,7 +13,6 @@ const HomeScreen = () => {
   const [timerActive, setTimerActive] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const intervalRef = useRef(null);
-  const [coins, setCoins] = useState(0);
 
   useEffect(() => {
     const fetchElapsedTime = async () => {
