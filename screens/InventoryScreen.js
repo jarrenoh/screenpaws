@@ -38,26 +38,28 @@ const InventoryScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.header}>Your Inventory</Text>
-    <FlatList
+      <FlatList
         data={userItems}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-            <View style={styles.itemContainer}>
-                <Image 
-                    source={images[item.imageName]} 
-                    style={styles.itemImage} 
-                    onError={(error) => console.log('Error loading image', error)}
-                    />
-                <Text style={styles.itemText}>{item.name}{" "}</Text>
-                <Text style={styles.itemDescription}>{item.description}</Text>
-                <TouchableOpacity style={styles.equipButton} onPress={() => handleEquipItem(item)}>
-                    <Text style={styles.equipButtonText}>
-                        {equippedItem && equippedItem.id === item.id ? 'Un-equip' : 'Equip'}
-                    </Text>
-                </TouchableOpacity>
+          <View style={styles.itemContainer}>
+            <Image 
+              source={images[item.imageName]} 
+              style={styles.itemImage} 
+              onError={(error) => console.log('Error loading image', error)}
+            />
+            <View style={styles.itemDetails}>
+              <Text style={styles.itemText}>{item.name}</Text>
+              <Text style={styles.itemDescription}>{item.description}</Text>
             </View>
+            <TouchableOpacity style={styles.equipButton} onPress={() => handleEquipItem(item)}>
+              <Text style={styles.equipButtonText}>
+                {equippedItem && equippedItem.id === item.id ? 'Un-equip' : 'Equip'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         )}
-    />
+      />
       <View style={styles.navbarContainer}>
         <CustomNavbar />
       </View>
@@ -89,6 +91,9 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     marginRight: 16,
+  },
+  itemDetails: {
+    flex: 1,
   },
   itemText: {
     fontSize: 18,
