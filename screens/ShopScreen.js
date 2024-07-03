@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Image, StyleSheet, View, Text, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
+import coin from '../assets/coin.png';
 import zenbg from '../assets/zenbg.webp';
 import yellowaura from '../assets/yellowaura.png';
 import blueaura from '../assets/blueaura.png';
 
 const images = {
+    coin : coin,
     zenbg: zenbg,
     yellowaura: yellowaura,
     blueaura: blueaura,
@@ -69,7 +71,10 @@ const ShopScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.coinsText}>Coins: {coins}</Text>
+      <View style={styles.coinsContainer}>
+        <Text style={styles.coinsText}>Coins: {coins} </Text>
+        <Image source={images.coin} style={styles.coinImage} />
+      </View>
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
@@ -81,7 +86,8 @@ const ShopScreen = () => {
               onError={(error) => console.log('Error loading image', error)}
               />
             <Text style={styles.itemText}>{item.name}</Text>
-            <Text style={styles.itemText}>Price: {item.price} coins</Text>
+            <Text style={styles.itemText}>{item.price}</Text>
+            <Image source={images.coin} style={styles.coinImage} />
             <TouchableOpacity
               style={[
                 styles.buyButton,
@@ -112,10 +118,19 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
+  coinsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  coinImage: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
+  },
   coinsText: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
   },
   itemContainer: {
     padding: 16,
