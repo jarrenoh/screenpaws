@@ -3,6 +3,7 @@ import { View, Text, TextInput, FlatList, ActivityIndicator, StyleSheet, Alert, 
 import { firebase, firestore, auth } from '../firebase';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest } from '../components/friendFunctions';
 import CustomNavbar from '../components/CustomNavbar';
+import { useNavigation } from '@react-navigation/native';
 
 const FriendsScreen = () => {
   const [friends, setFriends] = useState([]);
@@ -14,6 +15,8 @@ const FriendsScreen = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
   const currentUserId = auth.currentUser?.uid;
+
+  const navigation = useNavigation(); // Add this line to use navigation
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -224,6 +227,12 @@ const FriendsScreen = () => {
   const renderFriendItem = ({ item }) => (
     <View style={styles.friendItem}>
       <Text>{item.username}</Text>
+      <TouchableOpacity
+        style={styles.roundedButton1}
+        onPress={() => navigation.navigate('FriendPetScreen', { friendId: item.userId })}
+      >
+        <Text style={styles.buttonText}>View</Text>
+      </TouchableOpacity>
       <TouchableOpacity 
         style={styles.roundedButton2} 
         onPress={() => handleRemoveFriend(item.userId)}
