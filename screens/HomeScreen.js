@@ -143,7 +143,7 @@ const HomeScreen = () => {
         <AnimatedCircularProgress
           size={200}
           width={10}
-          fill={(countdownTime / initialCountdownTime) * 100}
+          fill={(initialCountdownTime > 0) ? (countdownTime / initialCountdownTime) * 100 : 0}
           tintColor="#00e0ff"
           backgroundColor="#3d5875"
         >
