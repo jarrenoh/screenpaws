@@ -245,6 +245,12 @@ const FriendsScreen = () => {
   const renderSearchResultItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text>{item.username}</Text>
+      <TouchableOpacity
+        style={styles.roundedButton4}
+        onPress={() => navigation.navigate('FriendPetScreen', { friendId: item.userId })}
+      >
+        <Text style={styles.buttonText}>View</Text>
+      </TouchableOpacity>
       <TouchableOpacity 
         style={styles.roundedButton3} 
         onPress={() => handleSendRequest(item.id)}
@@ -415,6 +421,14 @@ const styles = StyleSheet.create({
     borderRadius: 20, // This makes the button rounded
     backgroundColor: '#007BFF', // Change this to your desired button color
     marginRight: 5, // Adjust this value as needed
+  },
+  roundedButton4: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 20, // This makes the button rounded
+    backgroundColor: '#007BFF', // Change this to your desired button color
+    marginRight: -100, // Adjust this value as needed
   },
   buttonText: {
     color: '#fff',
