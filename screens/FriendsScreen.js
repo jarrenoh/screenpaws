@@ -247,7 +247,7 @@ const FriendsScreen = () => {
       <Text>{item.username}</Text>
       <TouchableOpacity
         style={styles.roundedButton4}
-        onPress={() => navigation.navigate('FriendPetScreen', { friendId: item.userId })}
+        onPress={() => navigation.navigate('FriendPetScreen', { friendId: item.id })}
       >
         <Text style={styles.buttonText}>View</Text>
       </TouchableOpacity>
