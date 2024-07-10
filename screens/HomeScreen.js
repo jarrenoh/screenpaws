@@ -83,16 +83,6 @@ const HomeScreen = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await updateElapsedTimeInFirestore(elapsedTime);
-    auth.signOut()
-      .then(() => {
-        console.log('Logged out');
-        navigation.replace('Login');
-      })
-      .catch(error => alert(error.message));
-  };
-
   const handleToggleTimer = () => {
     if (!timerActive && countdownTime <= 0) {
       alert('Please set a valid countdown time');
@@ -173,13 +163,6 @@ const HomeScreen = () => {
           style={[styles.button, timerActive ? styles.stopButton : styles.startButton]}
         >
           <Text style={styles.buttonText}>{timerActive ? 'Stop' : 'Start'}</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          onPress={handleLogout}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
         
       </View>
