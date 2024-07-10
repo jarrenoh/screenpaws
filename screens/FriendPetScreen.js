@@ -59,7 +59,7 @@ const FriendPetScreen = () => {
       </View>
       <View style={styles.content}>
         {equippedItem && <Image source={images[equippedItem.imageName]} style={styles.backgroundImage} />}
-        <Image source={level === 1 ? images.dog : level >= 5 ? images.swoledoge : images.placeholderImage} style={styles.image} />
+        <Image source={level === 1 ? images.hungrydog : level >= 5 ? images.swoledoge : images.shiba} style={styles.image} />
         <Text style={styles.text}>
           {level === 1 ? 'Hungry Dog' : level >= 2 && level <= 5 ? 'Weak Doge' : 'Swole Doge'}
         </Text>

@@ -3,8 +3,8 @@ import coin from '../assets/coin.png';
 import zenbg from '../assets/zenbg.webp';
 import yellowaura from '../assets/yellowaura.png';
 import blueaura from '../assets/blueaura.png';
-import dog from '../assets/dog.png';
-import placeholderImage from '../assets/dog.jpeg';
+import hungrydog from '../assets/hungrydog.png';
+import shiba from '../assets/shiba.png';
 import swoledoge from '../assets/swole.webp';
 import achievement from '../assets/achievement.png';
 import inventory from '../assets/bag.png';
@@ -21,8 +21,8 @@ const images = {
   zenbg: zenbg,
   yellowaura: yellowaura,
   blueaura: blueaura,
-  dog: dog,
-  placeholderImage: placeholderImage,
+  hungrydog: hungrydog,
+  shiba: shiba,
   swoledoge: swoledoge,
   achievement: achievement,
   inventory: inventory,
