@@ -118,8 +118,8 @@ const HomeScreen = () => {
       setTimerActive(false);
 
       Alert.alert(
-        "Timer Finished",
-        "Your countdown timer has reached zero!",
+        "Congrats!",
+        "You've gained " + Math.floor(initialCountdownTime / 60) +" XP and " + Math.floor(initialCountdownTime / 120) + " coins!",
         [
           { text: "OK" }
         ]
