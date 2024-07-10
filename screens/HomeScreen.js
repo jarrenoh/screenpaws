@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View, AppState } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View, AppState, Image } from 'react-native';
 import { auth, firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 import CustomNavbar from '../components/CustomNavbar';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Slider from '@react-native-community/slider';
+import images from '../components/images';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -138,6 +139,9 @@ const HomeScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsButton}>
+          <Image source={images.settings} style={styles.settingsIcon} />
+      </TouchableOpacity>
         <Text style={styles.welcomeText}>Welcome {auth.currentUser?.displayName}!</Text>
         <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
         <AnimatedCircularProgress
@@ -177,6 +181,7 @@ const HomeScreen = () => {
         >
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
+        
       </View>
       <CustomNavbar />
     </View>
@@ -224,5 +229,15 @@ const styles = StyleSheet.create({
   slider: {
     width: '80%',
     height: 40,
+  },
+  settingsButton: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+  },
+  settingsIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
   },
 });

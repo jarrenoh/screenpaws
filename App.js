@@ -10,6 +10,7 @@ import ShopScreen from './screens/ShopScreen';
 import AchievementScreen from './screens/AchievementScreen';
 import InventoryScreen from './screens/InventoryScreen';
 import FriendPetScreen from './screens/FriendPetScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
         <Stack.Screen options= {{headerShown: false}} name="Achievements" component={AchievementScreen} />
         <Stack.Screen options= {{headerShown: false}} name="FriendPetScreen" component={FriendPetScreen} />
         <Stack.Screen options= {{headerShown: false}} name="Inventory" component={InventoryScreen} />
+        <Stack.Screen options= {{headerShown: false}} name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

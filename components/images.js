@@ -21,6 +21,7 @@ import swoledoge from '../assets/swole.webp';
 import achievement from '../assets/achievement.png';
 import inventory from '../assets/bag.png';
 import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
+import settings from '../assets/settings.png';
 
 
 const images = {
@@ -46,6 +47,7 @@ const images = {
   achievement: achievement,
   inventory: inventory,
   pawLogo: pawLogo,
+  settings: settings,
 };
 
 export default images;

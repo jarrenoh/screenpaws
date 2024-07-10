@@ -10,7 +10,6 @@ const PetScreen = () => {
   const [level, setLevel] = useState(1);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [equippedItem, setEquippedItem] = useState(null);
-
   const navigation = useNavigation();
 
   useEffect(() => {
