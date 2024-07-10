@@ -4,7 +4,7 @@ import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 import { addAchievement, addUserAchievement } from '../components/achFunctions';
 
-import images from '../components/images';
+import images from '../components/images'; // Assuming all icons are exported from this file
 
 const AchievementScreen = () => {
   const [achievements, setAchievements] = useState([]);
@@ -14,19 +14,27 @@ const AchievementScreen = () => {
 
   useEffect(() => {
     const fetchAchievements = async () => {
-      const achievementsSnapshot = await firestore.collection('achievements').get();
-      const allAchievements = achievementsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setAchievements(allAchievements);
+      try {
+        const achievementsSnapshot = await firestore.collection('achievements').get();
+        const allAchievements = achievementsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setAchievements(allAchievements);
+      } catch (error) {
+        console.error('Error fetching achievements:', error);
+      }
     };
 
     const fetchUserAchievements = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const userDoc = await firestore.collection('users').doc(user.uid).get();
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-          setUserAchievements(userData.achievements || []);
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = await firestore.collection('users').doc(user.uid).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            setUserAchievements(userData.achievements || []);
+          }
         }
+      } catch (error) {
+        console.error('Error fetching user achievements:', error);
       }
     };
 
@@ -46,105 +54,82 @@ const AchievementScreen = () => {
       const user = auth.currentUser;
       if (!user) return;
 
-      const userDoc = await firestore.collection('users').doc(user.uid).get();
-      const userData = userDoc.data();
-      const userLevel = userData.level || 1;
+      try {
+        const userDoc = await firestore.collection('users').doc(user.uid).get();
+        const userData = userDoc.data();
+        const userLevel = userData.level || 1;
 
-      const addAchievementIfNotExist = async (achievementName, achievementDescription, thresholdLevel, icon) => {
-        const achievementsSnapshot = await firestore.collection('achievements')
-          .where('name', '==', achievementName)
-          .get();
+        const addAchievementIfNotExist = async (achievementName, achievementDescription, thresholdLevel, icon) => {
+          try {
+            const achievementsSnapshot = await firestore.collection('achievements')
+              .where('name', '==', achievementName)
+              .get();
 
-        if (achievementsSnapshot.empty) {
-          const newAchievementId = await addAchievement(achievementName, achievementDescription, thresholdLevel);
-          if (newAchievementId) {
-            await addUserAchievement(newAchievementId);
-            setUserAchievements(prev => [...prev, newAchievementId]); // Update state directly to reflect change
+            if (achievementsSnapshot.empty) {
+              const newAchievementId = await addAchievement(achievementName, achievementDescription, thresholdLevel);
+              if (newAchievementId) {
+                await addUserAchievement(newAchievementId);
+                setUserAchievements(prev => [...prev, newAchievementId]);
+              }
+            } else {
+              const achievementId = achievementsSnapshot.docs[0].id;
+              if (achievementId && !userAchievements.includes(achievementId)) {
+                await addUserAchievement(achievementId);
+                setUserAchievements(prev => [...prev, achievementId]);
+              }
+            }
+          } catch (error) {
+            console.error(`Error adding achievement "${achievementName}":`, error);
           }
-        } else {
-          const achievementId = achievementsSnapshot.docs[0].id;
-          if (achievementId && !userAchievements.includes(achievementId)) {
-            await addUserAchievement(achievementId);
-            setUserAchievements(prev => [...prev, achievementId]); // Update state directly to reflect change
-          }
+        };
+
+        if (userLevel >= 1) {
+          await addAchievementIfNotExist('First Login', 'Awarded for logging in for the first time', 1, images.achievement);
         }
-      };
+        if (userLevel >= 5) {
+          await addAchievementIfNotExist('Level 5 Achiever', 'Awarded for reaching level 5', 5, images.achievement);
+        }
+        if (userLevel >= 10) {
+          await addAchievementIfNotExist('Level 10 Achiever', 'Awarded for reaching level 10', 10, images.achievement);
+        }
+        if (userLevel >= 15) {
+          await addAchievementIfNotExist('Level 15 Achiever', 'Awarded for reaching level 15', 15, images.achievement);
+        }
+        if (userLevel >= 20) {
+          await addAchievementIfNotExist('Level 20 Achiever', 'Awarded for reaching level 20', 20, images.achievement);
+        }
+        if (userLevel >= 30) {
+          await addAchievementIfNotExist('Level 30 Achiever', 'Awarded for reaching level 30', 30, images.achievement);
+        }
+        if (userLevel >= 40) {
+          await addAchievementIfNotExist('Level 40 Achiever', 'Awarded for reaching level 40', 40, images.achievement);
+        }
+        if (userLevel >= 50) {
+          await addAchievementIfNotExist('Level 50 Achiever', 'Awarded for reaching level 50', 50, images.achievement);
+        }
+        if (userLevel >= 75) {
+          await addAchievementIfNotExist('Level 75 Achiever', 'Awarded for reaching level 75', 75, images.achievement);
+        }
+        if (userLevel >= 100) {
+          await addAchievementIfNotExist('Level 100 Achiever', 'Awarded for reaching level 100', 100, images.achievement);
+        }
+        if (userLevel >= 150) {
+          await addAchievementIfNotExist('Level 150 Achiever', 'Awarded for reaching level 150', 150, images.achievement);
+        }
+        if (userLevel >= 200) {
+          await addAchievementIfNotExist('Level 200 Achiever', 'Awarded for reaching level 200', 200, images.achievement);
+        }
 
-      if (userLevel >= 1) {
-        await addAchievementIfNotExist('First Login', 'Awarded for logging in for the first time', 1, WelcomeIcon);
+        setHasCheckedAchievements(true);
+      } catch (error) {
+        console.error('Error checking and adding achievements:', error);
       }
-      if (userLevel >= 5) {
-        await addAchievementIfNotExist('Level 5 Achiever', 'Awarded for reaching level 5', 5, NumberFiveIcon);
-      }
-      if (userLevel >= 10) {
-        await addAchievementIfNotExist('Level 10 Achiever', 'Awarded for reaching level 10', 10, Level10Icon);
-      }
-      if (userLevel >= 15) {
-        await addAchievementIfNotExist('Level 15 Achiever', 'Awarded for reaching level 15', 15, Level15Icon);
-      }
-      if (userLevel >= 20) {
-        await addAchievementIfNotExist('Level 20 Achiever', 'Awarded for reaching level 20', 20, Level20Icon);
-      }
-      if (userLevel >= 30) {
-        await addAchievementIfNotExist('Level 30 Achiever', 'Awarded for reaching level 30', 30, Level30Icon);
-      }
-      if (userLevel >= 40) {
-        await addAchievementIfNotExist('Level 40 Achiever', 'Awarded for reaching level 40', 40, Level40Icon);
-      }
-      if (userLevel >= 50) {
-        await addAchievementIfNotExist('Level 50 Achiever', 'Awarded for reaching level 50', 50, Level50Icon);
-      }
-      if (userLevel >= 75) {
-        await addAchievementIfNotExist('Level 75 Achiever', 'Awarded for reaching level 75', 75, Level75Icon);
-      }
-      if (userLevel >= 100) {
-        await addAchievementIfNotExist('Level 100 Achiever', 'Awarded for reaching level 100', 100, Level100Icon);
-      }
-      if (userLevel >= 150) {
-        await addAchievementIfNotExist('Level 150 Achiever', 'Awarded for reaching level 150', 150, Level150Icon);
-      }
-      if (userLevel >= 200) {
-        await addAchievementIfNotExist('Level 200 Achiever', 'Awarded for reaching level 200', 200, Level200Icon);
-      }
-
-      setHasCheckedAchievements(true);
     };
 
     if (!isFetching) {
       checkAndAddAchievement();
     }
   }, [isFetching, userAchievements, hasCheckedAchievements]);
-
-  const getAchievementIcon = (name) => {
-    switch (name) {
-      case 'First Login':
-        return images.WelcomeIcon;
-      case 'Level 5 Achiever':
-        return images.NumberFiveIcon;
-      case 'Level 10 Achiever':
-        return images.Level10Icon;
-      case 'Level 15 Achiever':
-        return images.Level15Icon;
-      case 'Level 20 Achiever':
-        return images.Level20Icon;
-      case 'Level 30 Achiever':
-        return images.Level30Icon;
-      case 'Level 40 Achiever':
-        return images.Level40Icon;
-      case 'Level 50 Achiever':
-        return images.Level50Icon;
-      case 'Level 75 Achiever':
-        return images.Level75Icon;
-      case 'Level 100 Achiever':
-        return images.Level100Icon;
-      case 'Level 150 Achiever':
-        return images.Level150Icon;
-      case 'Level 200 Achiever':
-        return images.Level200Icon;
-      default:
-        return null; // Or some default icon
-    }
-  };
 
   const sortAchievements = (a, b) => {
     const order = [
@@ -169,10 +154,10 @@ const AchievementScreen = () => {
   const combinedAchievements = achievements
     .map(achievement => ({
       ...achievement,
-      icon: getAchievementIcon(achievement.name), // Assign the appropriate icon
+      icon: images.achievement,
       status: userAchievements.includes(achievement.id) ? 'Unlocked' : 'Locked'
     }))
-    .sort(sortAchievements); // Sort achievements here
+    .sort(sortAchievements);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -184,7 +169,7 @@ const AchievementScreen = () => {
           <View style={styles.achievementContainer}>
             {item.icon && <Image source={item.icon} style={styles.achievementIcon} />}
             <Text style={styles.achievementText}>{item.name}</Text>
-            <Text style={styles.achievementText}>{item.status}</Text>
+            <Image source={item.status === 'Unlocked' ? images.unlock : images.lock} style={styles.statusIcon} />
           </View>
         )}
       />
@@ -218,12 +203,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   achievementIcon: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     marginRight: 16,
+    resizeMode: 'contain',
   },
   achievementText: {
     fontSize: 18,
+  },
+  statusIcon: {
+    width: 20,
+    height: 20,
+    marginLeft: 16,
   },
   navbarContainer: {
     position: 'absolute',
