@@ -23,10 +23,6 @@ const PetScreen = () => {
           const userData = userDoc.data();
           const userElapsedTime = userData.elapsedTime || 0;
           setElapsedTime(userElapsedTime);
-          const userXp = userData.xp || Math.floor(userElapsedTime / 60); // 1 XP per minute
-          setXp(userXp);
-          const userLevel = userData.level || Math.floor(userXp / 10) + 1; // 10 XP per level
-          setLevel(userLevel);
           const userEquippedItem = userData.equippedItem || null;
           setEquippedItem(userEquippedItem);
         }
@@ -36,6 +32,13 @@ const PetScreen = () => {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    const newXp = Math.floor(elapsedTime / 60); // 1 XP per minute
+    setXp(newXp);
+    const newLevel = Math.floor(newXp / 10) + 1; // 10 XP per level
+    setLevel(newLevel);
+  }, [elapsedTime]);
+
   const calculateXpPercentage = () => {
     const currentLevelXp = (level - 1) * 10;
     const nextLevelXp = level * 10;
@@ -44,9 +47,6 @@ const PetScreen = () => {
     const xpPercentage = (xpIntoLevel / levelXpRange) * 100;
     return isNaN(xpPercentage) ? 0 : xpPercentage;
   };
-
-  const xpBarContainerWidth = Dimensions.get('window').width * 0.8; // 80% of window width
-  const xpBarWidth = xpBarContainerWidth * (calculateXpPercentage() / 100);
 
   return (
     <View style={styles.container}>
