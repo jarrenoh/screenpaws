@@ -4,19 +4,7 @@ import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 import { addAchievement, addUserAchievement } from '../components/achFunctions';
 
-// Importing the icons
-import WelcomeIcon from '../assets/welcome.png';
-import NumberFiveIcon from '../assets/number-five-icon.png';
-import Level15Icon from '../assets/15.png';
-import Level10Icon from '../assets/number-ten-icon.png'; // Example, you need to add these icons
-import Level20Icon from '../assets/number-20_9543187.png';
-import Level30Icon from '../assets/30-512.png';
-import Level40Icon from '../assets/40-percent-icon.png';
-import Level50Icon from '../assets/50.png';
-import Level75Icon from '../assets/75.png';
-import Level100Icon from '../assets/100-percent-icon.png';
-import Level150Icon from '../assets/150_13928012.png';
-import Level200Icon from '../assets/200.png';
+import images from '../components/images';
 
 const AchievementScreen = () => {
   const [achievements, setAchievements] = useState([]);
@@ -130,29 +118,29 @@ const AchievementScreen = () => {
   const getAchievementIcon = (name) => {
     switch (name) {
       case 'First Login':
-        return WelcomeIcon;
+        return images.WelcomeIcon;
       case 'Level 5 Achiever':
-        return NumberFiveIcon;
+        return images.NumberFiveIcon;
       case 'Level 10 Achiever':
-        return Level10Icon;
+        return images.Level10Icon;
       case 'Level 15 Achiever':
-        return Level15Icon;
+        return images.Level15Icon;
       case 'Level 20 Achiever':
-        return Level20Icon;
+        return images.Level20Icon;
       case 'Level 30 Achiever':
-        return Level30Icon;
+        return images.Level30Icon;
       case 'Level 40 Achiever':
-        return Level40Icon;
+        return images.Level40Icon;
       case 'Level 50 Achiever':
-        return Level50Icon;
+        return images.Level50Icon;
       case 'Level 75 Achiever':
-        return Level75Icon;
+        return images.Level75Icon;
       case 'Level 100 Achiever':
-        return Level100Icon;
+        return images.Level100Icon;
       case 'Level 150 Achiever':
-        return Level150Icon;
+        return images.Level150Icon;
       case 'Level 200 Achiever':
-        return Level200Icon;
+        return images.Level200Icon;
       default:
         return null; // Or some default icon
     }

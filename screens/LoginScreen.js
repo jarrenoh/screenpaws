@@ -2,7 +2,7 @@ import { KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpaci
 import React, { useEffect, useState } from 'react';
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
-import pawLogo from '../assets/69-698991_footprints-clipart-cougar-transparent-background-dog-paw-clipart.png';
+import images from '../components/images';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -39,7 +39,7 @@ const LoginScreen = () => {
       behavior='padding'
       style={styles.container}
     >
-      <Image source={pawLogo} style={styles.image} />
+      <Image source={images.pawLogo} style={styles.image} />
       <Text style={styles.title}>ScreenPaws</Text>
       <View style={styles.inputContainer}>
         <TextInput

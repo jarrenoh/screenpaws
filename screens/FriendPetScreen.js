@@ -2,20 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Text, Dimensions, TouchableOpacity } from 'react-native';
 import { firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
-import dog from '../assets/dog.png';
-import placeholderImage from '../assets/dog.jpeg';
-import swoledoge from '../assets/swole.webp';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import zenbg from '../assets/zenbg.webp';
-import yellowaura from '../assets/yellowaura.png';
-import blueaura from '../assets/blueaura.png';
-
-const images = {
-  zenbg: zenbg,
-  yellowaura: yellowaura,
-  blueaura: blueaura,
-  // add more images here
-};
+import images from '../components/images';
 
 const FriendPetScreen = () => {
   const [xp, setXp] = useState(0);
@@ -71,7 +59,7 @@ const FriendPetScreen = () => {
       </View>
       <View style={styles.content}>
         {equippedItem && <Image source={images[equippedItem.imageName]} style={styles.backgroundImage} />}
-        <Image source={level === 1 ? dog : level >= 5 ? swoledoge : placeholderImage} style={styles.image} />
+        <Image source={level === 1 ? images.dog : level >= 5 ? images.swoledoge : images.placeholderImage} style={styles.image} />
         <Text style={styles.text}>
           {level === 1 ? 'Hungry Dog' : level >= 2 && level <= 5 ? 'Weak Doge' : 'Swole Doge'}
         </Text>

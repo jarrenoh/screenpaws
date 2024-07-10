@@ -61,8 +61,8 @@ const ShopScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.coinsContainer}>
-        <Text style={styles.coinsText}>Coins: {coins} </Text>
         <Image source={images.coin} style={styles.coinImage} />
+        <Text style={styles.coinsText}>Coins: {coins}</Text>
       </View>
       <FlatList
         data={items}
@@ -73,7 +73,7 @@ const ShopScreen = () => {
               source={images[item.imageName]} 
               style={styles.itemImage} 
               onError={(error) => console.log('Error loading image', error)}
-              />
+            />
             <Text style={styles.itemText}>{item.name}</Text>
             <Text style={styles.itemText}>{item.price}</Text>
             <Image source={images.coin} style={styles.coinImage} />
@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
   coinsText: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginLeft: 8,
   },
   itemContainer: {
     padding: 16,
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 18,
+    marginLeft: 20,
   },
   buyButton: {
     padding: 8,

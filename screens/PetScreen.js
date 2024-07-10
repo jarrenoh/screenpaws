@@ -2,22 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Text, Dimensions, TouchableOpacity } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
-import dog from '../assets/dog.png';
-import placeholderImage from '../assets/dog.jpeg';
-import swoledoge from '../assets/swole.webp';
-import achievement from '../assets/achievement.png';
-import inventory from '../assets/bag.png';
 import { useNavigation } from '@react-navigation/native';
-import zenbg from '../assets/zenbg.webp';
-import yellowaura from '../assets/yellowaura.png';
-import blueaura from '../assets/blueaura.png';
-
-const images = {
-  zenbg: zenbg,
-  yellowaura: yellowaura,
-  blueaura: blueaura,
-  // add more images here
-};
+import images from '../components/images';
 
 const PetScreen = () => {
   const [xp, setXp] = useState(0);
@@ -25,7 +11,6 @@ const PetScreen = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [equippedItem, setEquippedItem] = useState(null);
 
-  
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -67,7 +52,7 @@ const PetScreen = () => {
     <View style={styles.container}>
       <View style={styles.content}>
         {equippedItem && <Image source={images[equippedItem.imageName]} style={styles.backgroundImage} />}
-        <Image source={level === 1 ? dog : level >= 5 ? swoledoge : placeholderImage} style={styles.image} />
+        <Image source={level === 1 ? images.dog : level >= 5 ? images.swoledoge : images.placeholderImage} style={styles.image} />
         <Text style={styles.text}>
           {level === 1 ? 'Hungry Dog' : level >= 2 && level <= 5 ? 'Weak Doge' : 'Swole Doge'}
         </Text>
@@ -84,10 +69,10 @@ const PetScreen = () => {
       </View>
       <View style={styles.headerButtons}>
         <TouchableOpacity onPress={() => navigation.navigate('Achievements')} style={styles.achievementButton}>
-          <Image source={achievement} style={styles.achievementIcon} />
+          <Image source={images.achievement} style={styles.achievementIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Inventory')} style={styles.inventoryButton}>
-          <Image source={inventory} style={styles.inventoryIcon} />
+          <Image source={images.inventory} style={styles.inventoryIcon} />
         </TouchableOpacity>
       </View>
     </View>
