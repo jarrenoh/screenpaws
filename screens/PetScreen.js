@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 import { useNavigation } from '@react-navigation/native';
+import levelconfig from '../components/levelconfig';
 import images from '../components/images';
 
 const PetScreen = () => {
@@ -62,14 +63,19 @@ const PetScreen = () => {
     return isNaN(xpPercentage) ? 0 : xpPercentage;
   };
 
+  const getLevelConfig = (level) => {
+    const config = levelconfig.find(cfg => level >= cfg.range[0] && level <= cfg.range[1]) || levelConfig[levelConfig.length - 1];
+    return config;
+  };
+
+  const { image, label } = getLevelConfig(level);
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         {equippedItem && <Image source={images[equippedItem.imageName]} style={styles.backgroundImage} />}
-        <Image source={level === 1 ? images.hungrydog : level >= 5 ? images.swoledoge : images.shiba} style={styles.image} />
-        <Text style={styles.text}>
-          {level === 1 ? 'Hungry Dog' : level >= 2 && level <= 5 ? 'Weak Doge' : 'Swole Doge'}
-        </Text>
+        <Image source={image} style={styles.image} />
+        <Text style={styles.text}>{label}</Text>
         <Text style={styles.text}>XP: {xp}</Text>
         <Text style={styles.text}>Level: {level}</Text>
         <View style={styles.xpBarContainer}>

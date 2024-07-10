@@ -15,6 +15,7 @@ import settings from '../assets/settings.png';
 import seaside from '../assets/seaside.webp';
 import snow from '../assets/snow.jpg';
 import starrysky from '../assets/starrysky.jpg';
+import sigmadoge from '../assets/sigmadoge.png';
 
 const images = {
   coin: coin,
@@ -32,7 +33,8 @@ const images = {
   settings: settings,
   seaside: seaside,
   snow: snow,
-  starrysky: starrysky
+  starrysky: starrysky,
+  sigmadoge: sigmadoge
 };
 
 export default images;
