@@ -36,6 +36,23 @@ const PetScreen = () => {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    const updateUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDocRef = firestore.collection('users').doc(user.uid);
+        await userDocRef.update({
+          xp: xp,
+          level: level,
+          elapsedTime: elapsedTime,
+          equippedItem: equippedItem,
+        });
+      }
+    };
+
+    updateUserData();
+  }, [xp, level, elapsedTime, equippedItem]);
+
   const calculateXpPercentage = () => {
     const currentLevelXp = (level - 1) * 10;
     const nextLevelXp = level * 10;
