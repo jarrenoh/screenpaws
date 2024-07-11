@@ -266,7 +266,7 @@ const FriendsScreen = () => {
         style={styles.roundedButton2} 
         onPress={() => handleDeleteRequest(item.userId)}
       >
-        <Text style={styles.buttonText}>Delete Request</Text>
+        <Text style={styles.buttonText}>Unsend</Text>
       </TouchableOpacity>
     </View>
   );
