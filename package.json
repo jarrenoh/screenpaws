@@ -7,19 +7,26 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test" : "jest"
+    "test": "jest"
   },
   "jest": {
     "preset": "jest-expo",
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|firebase)"
-    ]
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|@react-native-firebase|@firebase|firebase|@firebase/.*))"
+    ],
+    "transform": {
+      "^.+\\.[tj]sx?$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "@react-navigation/native": "<rootDir>/node_modules/@react-navigation/native/lib/commonjs",
+      "@react-navigation/native-stack": "<rootDir>/node_modules/@react-navigation/native-stack/lib/commonjs"
+    }
   },
   "dependencies": {
     "@react-native-community/slider": "^4.5.2",
     "@react-native/metro-config": "^0.74.83",
     "@react-navigation/native": "^6.1.17",
-    "@react-navigation/native-stack": "^6.9.26",
+    "@react-navigation/native-stack": "^6.10.0",
     "expo": "~51.0.17",
     "expo-status-bar": "~1.12.1",
     "expo-updates": "^0.25.18",
@@ -33,7 +40,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "jest-expo": "^51.0.3"
   },
   "private": true
 }
