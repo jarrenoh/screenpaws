@@ -14,6 +14,7 @@ const HomeScreen = () => {
   const [timerActive, setTimerActive] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const intervalRef = useRef(null);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     const fetchElapsedTime = async () => {
@@ -58,6 +59,25 @@ const HomeScreen = () => {
       subscription.remove();
     };
   }, [timerActive]);
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const userDoc = await firestore.collection('users').doc(user.uid).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            setUsername(userData.username);
+          }
+        } catch (error) {
+          console.error('Error fetching username from Firestore:', error);
+        }
+      }
+    };
+
+    fetchUsername();
+  }, []);
 
   const updateElapsedTimeInFirestore = async (newElapsedTime) => {
     const user = auth.currentUser;
@@ -132,7 +152,7 @@ const HomeScreen = () => {
       <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsButton}>
           <Image source={images.settings} style={styles.settingsIcon} />
       </TouchableOpacity>
-        <Text style={styles.welcomeText}>Welcome {auth.currentUser?.displayName}!</Text>
+        <Text style={styles.welcomeText}>Welcome {username || auth.currentUser.displayName}!</Text>
         <Text style={styles.timer}>Focused Time: {formatTime(elapsedTime)}</Text>
         <AnimatedCircularProgress
           size={200}
