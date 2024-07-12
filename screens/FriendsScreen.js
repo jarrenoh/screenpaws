@@ -200,6 +200,47 @@ const FriendsScreen = () => {
     setLoadingSearch(false);
   };
 
+  const deleteFriendRequest = async (currentUserId, targetUserId) => {
+    try {
+      const batch = firestore.batch();
+      const currentUserRef = firestore.collection('users').doc(currentUserId);
+      const targetUserRef = firestore.collection('users').doc(targetUserId);
+  
+      // Remove the sent request from current user's sentRequests
+      batch.update(currentUserRef, {
+        sentRequests: firebase.firestore.FieldValue.arrayRemove(targetUserId),
+      });
+  
+      // Remove the received request from target user's friendRequests
+      batch.update(targetUserRef, {
+        friendRequests: firebase.firestore.FieldValue.arrayRemove(currentUserId),
+      });
+  
+      await batch.commit();
+      return true;
+    } catch (error) {
+      console.error('Error deleting friend request:', error.message);
+      return false;
+    }
+  };
+  
+  const handleDeleteRequest = async (targetUserId) => {
+    try {
+      const success = await deleteFriendRequest(currentUserId, targetUserId);
+      if (success) {
+        // Update the local state to remove the deleted request
+        setSentRequests(prevRequests => prevRequests.filter(request => request.userId !== targetUserId));
+        Alert.alert('Success', 'Friend request deleted successfully!');
+      } else {
+        Alert.alert('Error', 'Failed to delete friend request. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Error deleting friend request:', error.message);
+      Alert.alert('Error', 'Failed to delete friend request. Please try again later.');
+    }
+  };
+  
+
   const renderReceivedRequestItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text>{item.username}</Text>
@@ -220,9 +261,16 @@ const FriendsScreen = () => {
 
   const renderSentRequestItem = ({ item }) => (
     <View style={styles.requestItem}>
-      <Text>{item.username} (Pending) </Text>
+      <Text>{item.username} (Pending)</Text>
+      <TouchableOpacity 
+        style={styles.roundedButton2} 
+        onPress={() => handleDeleteRequest(item.userId)}
+      >
+        <Text style={styles.buttonText}>Unsend</Text>
+      </TouchableOpacity>
     </View>
   );
+  
 
   const renderFriendItem = ({ item }) => (
     <View style={styles.friendItem}>

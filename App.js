@@ -1,3 +1,4 @@
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/LoginScreen';
@@ -12,25 +13,24 @@ import InventoryScreen from './screens/InventoryScreen';
 import FriendPetScreen from './screens/FriendPetScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
+const Stack = createNativeStackNavigator();
+
 export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen options= {{headerShown: false}} name="Login" component={LoginScreen} />
-        <Stack.Screen options= {{headerShown: false}} name="Home" component={HomeScreen} />
-        <Stack.Screen options= {{headerShown: false}} name="Pet" component={PetScreen} />
-        <Stack.Screen options= {{headerShown: true}} name="Register" component={RegisterScreen} />
-        <Stack.Screen options= {{headerShown: false}} name="Friends" component={FriendsScreen} />
-        <Stack.Screen options= {{headerShown: false}} name="Leaderboard" component={LeaderboardScreen} />
-        <Stack.Screen options= {{headerShown: false}} name="Shop" component={ShopScreen} />
-        <Stack.Screen options= {{headerShown: false}} name="Achievements" component={AchievementScreen} />
-        <Stack.Screen options= {{headerShown: false}} name="FriendPetScreen" component={FriendPetScreen} />
-        <Stack.Screen options= {{headerShown: false}} name="Inventory" component={InventoryScreen} />
-        <Stack.Screen options= {{headerShown: false}} name="Settings" component={SettingsScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="Login" component={LoginScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="Home" component={HomeScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="Pet" component={PetScreen} />
+        <Stack.Screen options={{ headerShown: true }} name="Register" component={RegisterScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="Friends" component={FriendsScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="Leaderboard" component={LeaderboardScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="Shop" component={ShopScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="Achievements" component={AchievementScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="FriendPetScreen" component={FriendPetScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="Inventory" component={InventoryScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-
-const Stack = createNativeStackNavigator();
