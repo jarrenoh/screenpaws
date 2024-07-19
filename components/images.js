@@ -16,6 +16,8 @@ import seaside from '../assets/seaside.webp';
 import snow from '../assets/snow.jpg';
 import starrysky from '../assets/starrysky.jpg';
 import sigmadoge from '../assets/sigmadoge.png';
+import neonlights from '../assets/neonlights.jpg';
+import city from '../assets/city.jpg';
 
 const images = {
   coin: coin,
@@ -34,7 +36,9 @@ const images = {
   seaside: seaside,
   snow: snow,
   starrysky: starrysky,
-  sigmadoge: sigmadoge
+  sigmadoge: sigmadoge,
+  neonlights: neonlights,
+  city: city,
 };
 
 export default images;
