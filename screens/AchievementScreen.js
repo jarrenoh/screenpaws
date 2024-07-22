@@ -9,6 +9,7 @@ import images from '../components/images'; // Assuming all icons are exported fr
 const AchievementScreen = () => {
   const [achievements, setAchievements] = useState([]);
   const [userAchievements, setUserAchievements] = useState([]);
+  const [coins, setCoins] = useState(0);
   const [isFetching, setIsFetching] = useState(true);
   const [hasCheckedAchievements, setHasCheckedAchievements] = useState(false);
 
@@ -31,6 +32,7 @@ const AchievementScreen = () => {
           if (userDoc.exists) {
             const userData = userDoc.data();
             setUserAchievements(userData.achievements || []);
+            setCoins(userData.coins || 0);
           }
         }
       } catch (error) {
@@ -70,12 +72,22 @@ const AchievementScreen = () => {
               if (newAchievementId) {
                 await addUserAchievement(newAchievementId);
                 setUserAchievements(prev => [...prev, newAchievementId]);
+
+                // Add 100 coins for unlocking an achievement
+                const newCoins = coins + 100;
+                setCoins(newCoins);
+                await firestore.collection('users').doc(user.uid).update({ coins: newCoins });
               }
             } else {
               const achievementId = achievementsSnapshot.docs[0].id;
               if (achievementId && !userAchievements.includes(achievementId)) {
                 await addUserAchievement(achievementId);
                 setUserAchievements(prev => [...prev, achievementId]);
+
+                // Add 100 coins for unlocking an achievement
+                const newCoins = coins + 100;
+                setCoins(newCoins);
+                await firestore.collection('users').doc(user.uid).update({ coins: newCoins });
               }
             }
           } catch (error) {
@@ -129,7 +141,7 @@ const AchievementScreen = () => {
     if (!isFetching) {
       checkAndAddAchievement();
     }
-  }, [isFetching, userAchievements, hasCheckedAchievements]);
+  }, [isFetching, userAchievements, hasCheckedAchievements, coins]);
 
   const sortAchievements = (a, b) => {
     const order = [
