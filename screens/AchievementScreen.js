@@ -74,7 +74,7 @@ const AchievementScreen = () => {
                 setUserAchievements(prev => [...prev, newAchievementId]);
 
                 // Add 100 coins for unlocking an achievement
-                const newCoins = coins + 100;
+                const newCoins = coins + 10;
                 setCoins(newCoins);
                 await firestore.collection('users').doc(user.uid).update({ coins: newCoins });
               }
@@ -85,7 +85,7 @@ const AchievementScreen = () => {
                 setUserAchievements(prev => [...prev, achievementId]);
 
                 // Add 100 coins for unlocking an achievement
-                const newCoins = coins + 100;
+                const newCoins = coins + 10;
                 setCoins(newCoins);
                 await firestore.collection('users').doc(user.uid).update({ coins: newCoins });
               }
