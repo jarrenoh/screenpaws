@@ -36,6 +36,11 @@ const SettingsScreen = () => {
   };
 
   const handleSaveUsername = async () => {
+    if (!newUsername.trim()) {
+      alert('Username cannot be empty');
+      return;
+    }
+    
     try {
       const currentUser = auth.currentUser;
       if (currentUser) {

@@ -60,10 +60,10 @@ const ShopScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.coinsContainer}>
+      <SafeAreaView style={styles.coinsContainer}>
         <Image source={images.coin} style={styles.coinImage} />
         <Text style={styles.coinsText}>Coins: {coins}</Text>
-      </View>
+      </SafeAreaView>
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Image, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import { auth, firestore } from '../firebase';
 import CustomNavbar from '../components/CustomNavbar';
 import { useNavigation } from '@react-navigation/native';
@@ -71,31 +71,32 @@ const PetScreen = () => {
   const { image, label } = getLevelConfig(level);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.content}>
         {equippedItem && <Image source={images[equippedItem.imageName]} style={styles.backgroundImage} />}
         <Image source={image} style={styles.image} />
         <Text style={styles.text}>{label}</Text>
         <Text style={styles.text}>XP: {xp}</Text>
         <Text style={styles.text}>Level: {level}</Text>
-        <View style={styles.xpBarContainer}>
+        <SafeAreaView style={styles.xpBarContainer}>
           <View style={[styles.xpBar, { flex: calculateXpPercentage() / 100 }]} />
           <View style={{ flex: 1 - calculateXpPercentage() / 100 }} />
           <Text style={styles.xpText}>Progress: {calculateXpPercentage().toFixed(0)}%</Text>
-        </View>
-      </View>
-      <View style={styles.navbarContainer}>
+        </SafeAreaView>
+      </SafeAreaView>
+      <SafeAreaView style={styles.navbarContainer}>
         <CustomNavbar />
-      </View>
-      <View style={styles.headerButtons}>
+      </SafeAreaView>
+      <SafeAreaView style={styles.headerButtons}>
         <TouchableOpacity onPress={() => navigation.navigate('Achievements')} style={styles.achievementButton}>
           <Image source={images.achievement} style={styles.achievementIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Inventory')} style={styles.inventoryButton}>
           <Image source={images.inventory} style={styles.inventoryIcon} />
         </TouchableOpacity>
-      </View>
-    </View>
+      </SafeAreaView>
+    </SafeAreaView>
+
   );
 };
 
@@ -104,8 +105,12 @@ export default PetScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'center'
+    paddingBottom: 80, // Add padding to ensure content doesn't overlap with the navbar
   },
   headerButtons: {
     flexDirection: 'row',
@@ -136,11 +141,6 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: 'contain',
     zIndex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   backgroundImage: {
     position: 'absolute',
@@ -187,3 +187,4 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+
