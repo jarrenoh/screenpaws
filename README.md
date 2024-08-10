@@ -5,7 +5,7 @@ Installation
 2. Create an Expo account / Sign in to your account
 3. Scan the QR Code below to try out Screenpaws!
  
-![expoqr](https://github.com/user-attachments/assets/cde53ff0-3e5b-4d57-a05c-245d08dfe2db)
+![expoqr](https://github.com/user-attachments/assets/ddcd165e-f929-4258-bd52-8acda0aa1fad)
 
 (Windows/Mac)
 1. Ensure that you have all prior dependencies installed (Node.js, nvm, Expo)
