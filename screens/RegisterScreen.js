@@ -22,9 +22,15 @@ const RegisterScreen = () => {
   }, []);
 
   const handleSignUp = () => {
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      alert('Username cannot be empty');
+      return;
+    }
+
     firestore
       .collection('users')
-      .where('username', '==', username)
+      .where('username', '==', trimmedUsername)
       .get()
       .then((querySnapshot) => {
         if (!querySnapshot.empty) {
@@ -35,15 +41,14 @@ const RegisterScreen = () => {
             .then(userCredential => {
               const user = userCredential.user;
               user.updateProfile({
-                displayName: username
+                displayName: trimmedUsername
               }).then(() => {
                 console.log('Username updated successfully');
                 firestore
                   .collection('users')
                   .doc(user.uid)
                   .set({
-                    username: username,
-                    email: email
+                    username: trimmedUsername
                   })
                   .then(() => {
                     console.log('User added to Firestore');

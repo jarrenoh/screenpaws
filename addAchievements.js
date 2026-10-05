@@ -1,8 +1,8 @@
 const admin = require('firebase-admin');
-const serviceAccount = require('./screenpaws-firebase-adminsdk-ftqoe-96aa47c99a.json'); // Update with your service account key
 
+// Uses the service account key at GOOGLE_APPLICATION_CREDENTIALS. Never commit the key file.
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.applicationDefault(),
 });
 
 const db = admin.firestore();

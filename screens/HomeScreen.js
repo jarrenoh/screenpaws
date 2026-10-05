@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View, AppState, Image, SafeAreaView } from 'react-native';
-import { auth, firestore } from '../firebase';
+import { auth, firestore, firebase } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 import CustomNavbar from '../components/CustomNavbar';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
@@ -69,6 +69,10 @@ const HomeScreen = () => {
           if (userDoc.exists) {
             const userData = userDoc.data();
             setUsername(userData.username);
+            // User docs are publicly readable, so remove emails stored by older app versions
+            if (userData.email !== undefined) {
+              await userDoc.ref.update({ email: firebase.firestore.FieldValue.delete() });
+            }
           }
         } catch (error) {
           console.error('Error fetching username from Firestore:', error);

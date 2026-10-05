@@ -36,7 +36,8 @@ const SettingsScreen = () => {
   };
 
   const handleSaveUsername = async () => {
-    if (!newUsername.trim()) {
+    const trimmedUsername = newUsername.trim();
+    if (!trimmedUsername) {
       alert('Username cannot be empty');
       return;
     }
@@ -44,10 +45,16 @@ const SettingsScreen = () => {
     try {
       const currentUser = auth.currentUser;
       if (currentUser) {
+        const existing = await firestore.collection('users').where('username', '==', trimmedUsername).get();
+        if (existing.docs.some(doc => doc.id !== currentUser.uid)) {
+          alert('Username already exists. Please choose a different username.');
+          return;
+        }
+
         await firestore.collection('users').doc(currentUser.uid).update({
-          username: newUsername,
+          username: trimmedUsername,
         });
-        setUsername(newUsername); // Update local state with new username
+        setUsername(trimmedUsername); // Update local state with new username
         setModalVisible(false); // Close the modal after update
         console.log('Username updated successfully');
       }
